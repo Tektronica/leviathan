@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="153595d8-6b37-4d86-a506-12e76145f6a2" name="Default Changelist" comment="Initial commit">
-      <change beforePath="$PROJECT_DIR$/../leviathan/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../leviathan/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,7 +17,12 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../leviathan" />
+    <option name="PREVIOUS_COMMIT_AUTHORS">
+      <list>
+        <option value="Tektronica &lt;9472267+tektronica@users.noreply.github.com&gt;" />
+      </list>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1Ylcio37vDLdGxG5HHiCO21jKnp" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -28,7 +33,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../leviathan" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="settings.github" />
   </component>
   <component name="RecentsManager">
@@ -60,27 +65,6 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
-      <module name="leviathan" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <configuration name="wizard_script" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="leviathan" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -100,49 +84,6 @@
       <option name="MODULE_MODE" value="false" />
       <option name="REDIRECT_INPUT" value="false" />
       <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration default="true" type="Tox" factoryName="Tox">
-      <module name="leviathan" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <method v="2" />
-    </configuration>
-    <configuration default="true" type="tests" factoryName="Doctests">
-      <module name="leviathan" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="" />
-      <option name="CLASS_NAME" value="" />
-      <option name="METHOD_NAME" value="" />
-      <option name="FOLDER_NAME" value="" />
-      <option name="TEST_TYPE" value="TEST_SCRIPT" />
-      <option name="PATTERN" value="" />
-      <option name="USE_PATTERN" value="false" />
-      <method v="2" />
-    </configuration>
-    <configuration default="true" type="tests" factoryName="Unittests">
-      <module name="leviathan" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="" />
-      <option name="IS_MODULE_SDK" value="false" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="_new_additionalArguments" value="&quot;&quot;" />
-      <option name="_new_target" value="&quot;&quot;" />
-      <option name="_new_targetType" value="&quot;PATH&quot;" />
       <method v="2" />
     </configuration>
     <list>
@@ -174,7 +115,21 @@
       <option name="project" value="LOCAL" />
       <updated>1587164185683</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Initial commit">
+      <created>1587164739294</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1587164739294</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Initial commit">
+      <created>1587164950711</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1587164950711</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -186,18 +141,18 @@
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="232" y="362" key="#Inspections/0.0.2560.1400@0.0.2560.1400" timestamp="1585003986452" />
-    <state x="232" y="362" key="#Notifications" timestamp="1587164431243">
+    <state x="232" y="362" key="#Notifications" timestamp="1587165011823">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="232" y="362" key="#Notifications/0.0.2560.1400@0.0.2560.1400" timestamp="1587164431243" />
+    <state x="232" y="362" key="#Notifications/0.0.2560.1400@0.0.2560.1400" timestamp="1587165011823" />
     <state x="1404" y="243" width="1092" height="706" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1587056091222">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="1404" y="243" width="1092" height="706" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1587056091222" />
-    <state x="555" y="253" key="CommitChangelistDialog2" timestamp="1587164913794">
+    <state x="555" y="253" key="CommitChangelistDialog2" timestamp="1587166064979">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="555" y="253" key="CommitChangelistDialog2/0.0.2560.1400@0.0.2560.1400" timestamp="1587164913794" />
+    <state x="555" y="253" key="CommitChangelistDialog2/0.0.2560.1400@0.0.2560.1400" timestamp="1587166064979" />
     <state x="918" y="564" width="1138" height="1200" key="DiffContextDialog" timestamp="1584759302426">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
@@ -210,22 +165,22 @@
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="510" y="597" key="Github.ShareDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1587164597175" />
-    <state width="1256" height="300" key="GridCell.Tab.0.bottom" timestamp="1587158921071">
+    <state width="628" height="300" key="GridCell.Tab.0.bottom" timestamp="1587165284281">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state width="1256" height="300" key="GridCell.Tab.0.bottom/0.0.2560.1400@0.0.2560.1400" timestamp="1587158921071" />
-    <state width="1256" height="300" key="GridCell.Tab.0.center" timestamp="1587158921071">
+    <state width="628" height="300" key="GridCell.Tab.0.bottom/0.0.2560.1400@0.0.2560.1400" timestamp="1587165284281" />
+    <state width="628" height="300" key="GridCell.Tab.0.center" timestamp="1587165284281">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state width="1256" height="300" key="GridCell.Tab.0.center/0.0.2560.1400@0.0.2560.1400" timestamp="1587158921071" />
-    <state width="1256" height="300" key="GridCell.Tab.0.left" timestamp="1587158921071">
+    <state width="628" height="300" key="GridCell.Tab.0.center/0.0.2560.1400@0.0.2560.1400" timestamp="1587165284281" />
+    <state width="628" height="300" key="GridCell.Tab.0.left" timestamp="1587165284281">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state width="1256" height="300" key="GridCell.Tab.0.left/0.0.2560.1400@0.0.2560.1400" timestamp="1587158921071" />
-    <state width="1256" height="300" key="GridCell.Tab.0.right" timestamp="1587158921071">
+    <state width="628" height="300" key="GridCell.Tab.0.left/0.0.2560.1400@0.0.2560.1400" timestamp="1587165284281" />
+    <state width="628" height="300" key="GridCell.Tab.0.right" timestamp="1587165284281">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state width="1256" height="300" key="GridCell.Tab.0.right/0.0.2560.1400@0.0.2560.1400" timestamp="1587158921071" />
+    <state width="628" height="300" key="GridCell.Tab.0.right/0.0.2560.1400@0.0.2560.1400" timestamp="1587165284281" />
     <state width="1256" height="490" key="GridCell.Tab.1.bottom" timestamp="1587105325765">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
@@ -246,10 +201,10 @@
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="141" y="346" key="SettingsEditor/0.0.2560.1400@0.0.2560.1400" timestamp="1587164448958" />
-    <state x="232" y="436" key="Vcs.Push.Dialog.v2" timestamp="1587164636065">
+    <state x="232" y="436" key="Vcs.Push.Dialog.v2" timestamp="1587164995040">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="232" y="436" key="Vcs.Push.Dialog.v2/0.0.2560.1400@0.0.2560.1400" timestamp="1587164636065" />
+    <state x="232" y="436" key="Vcs.Push.Dialog.v2/0.0.2560.1400@0.0.2560.1400" timestamp="1587164995040" />
     <state x="767" y="91" width="1716" height="1200" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1584759601610">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
@@ -262,6 +217,10 @@
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="428" y="437" key="com.intellij.openapi.vcs.changes.SpecificFilesViewDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1587163822863" />
+    <state x="449" y="620" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1587164971180">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="449" y="620" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.2560.1400@0.0.2560.1400" timestamp="1587164971180" />
     <state x="303" y="320" width="672" height="678" key="search.everywhere.popup" timestamp="1585667953468">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
