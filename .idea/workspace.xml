@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="153595d8-6b37-4d86-a506-12e76145f6a2" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/../leviathan/.gitignore" afterDir="false" />
+    <list default="true" id="153595d8-6b37-4d86-a506-12e76145f6a2" name="Default Changelist" comment="Initial commit">
+      <change beforePath="$PROJECT_DIR$/../leviathan/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../leviathan/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -29,10 +29,11 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/../leviathan" />
-    <property name="settings.editor.selected.configurable" value="vcs.Git" />
+    <property name="settings.editor.selected.configurable" value="settings.github" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\ryalh\Documents\Python Projects\leviathan\Documentation" />
       <recent name="C:\Users\ryalh\Documents\Python Projects\gui_test" />
       <recent name="C:\Users\ryalh\Documents\Python Projects\gui_test\Test Scripts" />
     </key>
@@ -166,25 +167,37 @@
       <option name="presentableId" value="Default" />
       <updated>1583520750110</updated>
     </task>
+    <task id="LOCAL-00001" summary="Initial commit">
+      <created>1587164185683</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1587164185683</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Initial commit" />
+    <option name="LAST_COMMIT_MESSAGE" value="Initial commit" />
   </component>
   <component name="WindowStateProjectService">
     <state x="232" y="362" key="#Inspections" timestamp="1585003986452">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="232" y="362" key="#Inspections/0.0.2560.1400@0.0.2560.1400" timestamp="1585003986452" />
-    <state x="232" y="362" key="#Notifications" timestamp="1587159723923">
+    <state x="232" y="362" key="#Notifications" timestamp="1587164431243">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="232" y="362" key="#Notifications/0.0.2560.1400@0.0.2560.1400" timestamp="1587159723923" />
+    <state x="232" y="362" key="#Notifications/0.0.2560.1400@0.0.2560.1400" timestamp="1587164431243" />
     <state x="1404" y="243" width="1092" height="706" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1587056091222">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="1404" y="243" width="1092" height="706" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1587056091222" />
-    <state x="294" y="300" key="CommitChangelistDialog2" timestamp="1587163862708">
+    <state x="294" y="300" key="CommitChangelistDialog2" timestamp="1587164465571">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="294" y="300" key="CommitChangelistDialog2/0.0.2560.1400@0.0.2560.1400" timestamp="1587163862708" />
+    <state x="294" y="300" key="CommitChangelistDialog2/0.0.2560.1400@0.0.2560.1400" timestamp="1587164465571" />
     <state x="918" y="564" width="1138" height="1200" key="DiffContextDialog" timestamp="1584759302426">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
@@ -193,6 +206,10 @@
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="665" y="436" key="FileChooserDialogImpl/0.0.2560.1400@0.0.2560.1400" timestamp="1587163669761" />
+    <state x="510" y="597" key="Github.ShareDialog" timestamp="1587164597175">
+      <screen x="0" y="0" width="2560" height="1400" />
+    </state>
+    <state x="510" y="597" key="Github.ShareDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1587164597175" />
     <state width="1256" height="300" key="GridCell.Tab.0.bottom" timestamp="1587158921071">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
@@ -225,14 +242,14 @@
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state width="1256" height="490" key="GridCell.Tab.1.right/0.0.2560.1400@0.0.2560.1400" timestamp="1587105325765" />
-    <state x="141" y="346" key="SettingsEditor" timestamp="1587163655480">
+    <state x="141" y="346" key="SettingsEditor" timestamp="1587164448958">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="141" y="346" key="SettingsEditor/0.0.2560.1400@0.0.2560.1400" timestamp="1587163655480" />
-    <state x="232" y="436" key="Vcs.Push.Dialog.v2" timestamp="1587164023991">
+    <state x="141" y="346" key="SettingsEditor/0.0.2560.1400@0.0.2560.1400" timestamp="1587164448958" />
+    <state x="232" y="436" key="Vcs.Push.Dialog.v2" timestamp="1587164636065">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="232" y="436" key="Vcs.Push.Dialog.v2/0.0.2560.1400@0.0.2560.1400" timestamp="1587164023991" />
+    <state x="232" y="436" key="Vcs.Push.Dialog.v2/0.0.2560.1400@0.0.2560.1400" timestamp="1587164636065" />
     <state x="767" y="91" width="1716" height="1200" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1584759601610">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
