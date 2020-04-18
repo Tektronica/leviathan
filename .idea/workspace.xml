@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="153595d8-6b37-4d86-a506-12e76145f6a2" name="Default Changelist" comment="Initial commit">
+    <list default="true" id="153595d8-6b37-4d86-a506-12e76145f6a2" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -33,6 +34,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="settings.github" />
   </component>
@@ -129,7 +131,14 @@
       <option name="project" value="LOCAL" />
       <updated>1587164950711</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Initial commit">
+      <created>1587166101805</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1587166101806</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
@@ -141,18 +150,18 @@
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="232" y="362" key="#Inspections/0.0.2560.1400@0.0.2560.1400" timestamp="1585003986452" />
-    <state x="232" y="362" key="#Notifications" timestamp="1587165011823">
+    <state x="232" y="362" key="#Notifications" timestamp="1587166194571">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="232" y="362" key="#Notifications/0.0.2560.1400@0.0.2560.1400" timestamp="1587165011823" />
+    <state x="232" y="362" key="#Notifications/0.0.2560.1400@0.0.2560.1400" timestamp="1587166194571" />
     <state x="1404" y="243" width="1092" height="706" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1587056091222">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="1404" y="243" width="1092" height="706" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1587056091222" />
-    <state x="555" y="253" key="CommitChangelistDialog2" timestamp="1587166064979">
+    <state x="555" y="253" key="CommitChangelistDialog2" timestamp="1587166101291">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="555" y="253" key="CommitChangelistDialog2/0.0.2560.1400@0.0.2560.1400" timestamp="1587166064979" />
+    <state x="555" y="253" key="CommitChangelistDialog2/0.0.2560.1400@0.0.2560.1400" timestamp="1587166101291" />
     <state x="918" y="564" width="1138" height="1200" key="DiffContextDialog" timestamp="1584759302426">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
@@ -201,10 +210,10 @@
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="141" y="346" key="SettingsEditor/0.0.2560.1400@0.0.2560.1400" timestamp="1587164448958" />
-    <state x="232" y="436" key="Vcs.Push.Dialog.v2" timestamp="1587164995040">
+    <state x="232" y="436" key="Vcs.Push.Dialog.v2" timestamp="1587166131556">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="232" y="436" key="Vcs.Push.Dialog.v2/0.0.2560.1400@0.0.2560.1400" timestamp="1587164995040" />
+    <state x="232" y="436" key="Vcs.Push.Dialog.v2/0.0.2560.1400@0.0.2560.1400" timestamp="1587166131556" />
     <state x="767" y="91" width="1716" height="1200" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1584759601610">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
