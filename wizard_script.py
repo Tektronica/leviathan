@@ -210,8 +210,8 @@ class WizardFrame(wx.Frame):
             self.variable_ctrl[idx] = wx.TextCtrl(self.panel_4, wx.ID_ANY, "")
 
         self.bitmap_button_1 = wx.BitmapButton(self.panel_4, wx.ID_ANY,
-                                               wx.Bitmap("btn_add_depressed.png", wx.BITMAP_TYPE_ANY))
-        self.bitmap_button_1.SetBitmapPressed(wx.Bitmap("btn_add_pressed.png", wx.BITMAP_TYPE_ANY))
+                                               wx.Bitmap("images/btn_add_depressed.png", wx.BITMAP_TYPE_ANY))
+        self.bitmap_button_1.SetBitmapPressed(wx.Bitmap("images/btn_add_pressed.png", wx.BITMAP_TYPE_ANY))
         self.btn_execute = wx.Button(self.panel_2, wx.ID_ANY, "Execute")
         self.spin_ctrl_double_1 = wx.SpinCtrlDouble(self.panel_2, wx.ID_ANY, "1.0", min=0.0, max=100.0)
         self.btn_clear = wx.Button(self.panel_2, wx.ID_ANY, "Clear")
@@ -340,7 +340,7 @@ class WizardFrame(wx.Frame):
 
         label_1 = wx.StaticText(self.panel_2, wx.ID_ANY, "Script Wizard")
         label_1.SetFont(wx.Font(20, wx.FONTFAMILY_DECORATIVE, wx.FONTSTYLE_ITALIC, wx.FONTWEIGHT_BOLD, 0, ""))
-        bitmap_1 = wx.StaticBitmap(self.panel_2, wx.ID_ANY, wx.Bitmap("Fluke Logo.png", wx.BITMAP_TYPE_ANY))
+        bitmap_1 = wx.StaticBitmap(self.panel_2, wx.ID_ANY, wx.Bitmap("images/Fluke Logo.png", wx.BITMAP_TYPE_ANY))
         static_line_1 = wx.StaticLine(self.panel_2, wx.ID_ANY)
         static_line_1.SetMinSize((550, 2))
         grid_sizer_1.Add(label_1, (0, 0), (1, 6), wx.ALIGN_CENTER_VERTICAL, 0)

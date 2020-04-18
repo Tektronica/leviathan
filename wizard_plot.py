@@ -151,7 +151,7 @@ class PlotFrame(wx.Frame):
         label_16 = wx.StaticText(self.panel_2, wx.ID_ANY, "Configure Plot")
         label_16.SetFont(wx.Font(20, wx.FONTFAMILY_DECORATIVE, wx.FONTSTYLE_ITALIC, wx.FONTWEIGHT_BOLD, 0, ""))
         grid_sizer_2.Add(label_16, (0, 0), (1, 4), wx.ALIGN_CENTER_VERTICAL | wx.ALL, 10)
-        bitmap_1 = wx.StaticBitmap(self.panel_2, wx.ID_ANY, wx.Bitmap("Fluke Logo.png", wx.BITMAP_TYPE_ANY))
+        bitmap_1 = wx.StaticBitmap(self.panel_2, wx.ID_ANY, wx.Bitmap("images/Fluke Logo.png", wx.BITMAP_TYPE_ANY))
         grid_sizer_2.Add(bitmap_1, (0, 6), (1, 1), wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_RIGHT | wx.ALL, 10)
         static_line_2 = wx.StaticLine(self.panel_2, wx.ID_ANY)
         static_line_2.SetMinSize((800, 2))

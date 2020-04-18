@@ -173,7 +173,7 @@ class MyFrame(wx.Frame):
         grid_sizer_1 = wx.GridBagSizer(0, 0)
         sizer_3 = wx.StaticBoxSizer(wx.StaticBox(self.panel_2, wx.ID_ANY, "Optional Attributes"), wx.VERTICAL)
         label_1 = wx.StaticText(self.panel_2, wx.ID_ANY, "Test and Validation Suite")
-        bitmap_1 = wx.StaticBitmap(self.panel_2, wx.ID_ANY, wx.Bitmap("Fluke Logo.png", wx.BITMAP_TYPE_ANY))
+        bitmap_1 = wx.StaticBitmap(self.panel_2, wx.ID_ANY, wx.Bitmap("images/Fluke Logo.png", wx.BITMAP_TYPE_ANY))
         label_1.SetFont(wx.Font(20, wx.FONTFAMILY_DECORATIVE, wx.FONTSTYLE_ITALIC, wx.FONTWEIGHT_BOLD, 0, ""))
         grid_sizer_1.Add(label_1, (0, 0), (1, 4), wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 5)
         grid_sizer_1.Add(bitmap_1, (0, 4), (1, 1), 0, 10)

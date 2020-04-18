@@ -3,7 +3,16 @@
   <component name="ChangeListManager">
     <list default="true" id="153595d8-6b37-4d86-a506-12e76145f6a2" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Fluke Logo.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/MainLauncher.py" beforeDir="false" afterPath="$PROJECT_DIR$/MainLauncher.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Matplotlib_compressed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/UI_Screenshot.PNG" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/btn_add.svg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/btn_add_depressed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/btn_add_pressed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/wizard_instrument.py" beforeDir="false" afterPath="$PROJECT_DIR$/wizard_instrument.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/wizard_plot.py" beforeDir="false" afterPath="$PROJECT_DIR$/wizard_plot.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/wizard_script.py" beforeDir="false" afterPath="$PROJECT_DIR$/wizard_script.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,7 +54,7 @@
       <recent name="C:\Users\ryalh\Documents\Python Projects\gui_test\Test Scripts" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.MainLauncher">
+  <component name="RunManager" selected="Python.wizard_plot">
     <configuration name="MainLauncher" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="leviathan" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -59,6 +68,69 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/MainLauncher.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="wizard_instrument" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="leviathan" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/wizard_instrument.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="wizard_plot" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="leviathan" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/wizard_plot.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="wizard_script (1)" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="leviathan" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/wizard_script.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -91,9 +163,15 @@
     <list>
       <item itemvalue="Python.MainLauncher" />
       <item itemvalue="Python.wizard_script" />
+      <item itemvalue="Python.wizard_script (1)" />
+      <item itemvalue="Python.wizard_instrument" />
+      <item itemvalue="Python.wizard_plot" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.wizard_plot" />
+        <item itemvalue="Python.wizard_instrument" />
+        <item itemvalue="Python.wizard_script (1)" />
         <item itemvalue="Python.MainLauncher" />
         <item itemvalue="Python.wizard_script" />
       </list>
@@ -138,12 +216,28 @@
       <option name="project" value="LOCAL" />
       <updated>1587166101806</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="added link to github tutorial to description. We'll move in the future, if needed.">
+      <created>1587175192345</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1587175192345</updated>
+    </task>
+    <task id="LOCAL-00006" summary="moved images to their own directory">
+      <created>1587183877036</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1587183877036</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Initial commit" />
-    <option name="LAST_COMMIT_MESSAGE" value="Initial commit" />
+    <MESSAGE value="added link to github tutorial to description. We'll move in the future, if needed." />
+    <MESSAGE value="moved images to their own directory" />
+    <option name="LAST_COMMIT_MESSAGE" value="moved images to their own directory" />
   </component>
   <component name="WindowStateProjectService">
     <state x="232" y="362" key="#Inspections" timestamp="1585003986452">
@@ -158,10 +252,10 @@
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="1404" y="243" width="1092" height="706" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1587056091222" />
-    <state x="555" y="253" key="CommitChangelistDialog2" timestamp="1587166101291">
+    <state x="555" y="253" key="CommitChangelistDialog2" timestamp="1587183876708">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="555" y="253" key="CommitChangelistDialog2/0.0.2560.1400@0.0.2560.1400" timestamp="1587166101291" />
+    <state x="555" y="253" key="CommitChangelistDialog2/0.0.2560.1400@0.0.2560.1400" timestamp="1587183876708" />
     <state x="918" y="564" width="1138" height="1200" key="DiffContextDialog" timestamp="1584759302426">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
@@ -174,22 +268,22 @@
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="510" y="597" key="Github.ShareDialog/0.0.2560.1400@0.0.2560.1400" timestamp="1587164597175" />
-    <state width="628" height="300" key="GridCell.Tab.0.bottom" timestamp="1587165284281">
+    <state width="628" height="298" key="GridCell.Tab.0.bottom" timestamp="1587184014048">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state width="628" height="300" key="GridCell.Tab.0.bottom/0.0.2560.1400@0.0.2560.1400" timestamp="1587165284281" />
-    <state width="628" height="300" key="GridCell.Tab.0.center" timestamp="1587165284281">
+    <state width="628" height="298" key="GridCell.Tab.0.bottom/0.0.2560.1400@0.0.2560.1400" timestamp="1587184014048" />
+    <state width="628" height="298" key="GridCell.Tab.0.center" timestamp="1587184014048">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state width="628" height="300" key="GridCell.Tab.0.center/0.0.2560.1400@0.0.2560.1400" timestamp="1587165284281" />
-    <state width="628" height="300" key="GridCell.Tab.0.left" timestamp="1587165284281">
+    <state width="628" height="298" key="GridCell.Tab.0.center/0.0.2560.1400@0.0.2560.1400" timestamp="1587184014048" />
+    <state width="628" height="298" key="GridCell.Tab.0.left" timestamp="1587184014048">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state width="628" height="300" key="GridCell.Tab.0.left/0.0.2560.1400@0.0.2560.1400" timestamp="1587165284281" />
-    <state width="628" height="300" key="GridCell.Tab.0.right" timestamp="1587165284281">
+    <state width="628" height="298" key="GridCell.Tab.0.left/0.0.2560.1400@0.0.2560.1400" timestamp="1587184014048" />
+    <state width="628" height="298" key="GridCell.Tab.0.right" timestamp="1587184014048">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state width="628" height="300" key="GridCell.Tab.0.right/0.0.2560.1400@0.0.2560.1400" timestamp="1587165284281" />
+    <state width="628" height="298" key="GridCell.Tab.0.right/0.0.2560.1400@0.0.2560.1400" timestamp="1587184014048" />
     <state width="1256" height="490" key="GridCell.Tab.1.bottom" timestamp="1587105325765">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
@@ -210,10 +304,10 @@
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
     <state x="141" y="346" key="SettingsEditor/0.0.2560.1400@0.0.2560.1400" timestamp="1587164448958" />
-    <state x="232" y="436" key="Vcs.Push.Dialog.v2" timestamp="1587166131556">
+    <state x="232" y="436" key="Vcs.Push.Dialog.v2" timestamp="1587175219470">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
-    <state x="232" y="436" key="Vcs.Push.Dialog.v2/0.0.2560.1400@0.0.2560.1400" timestamp="1587166131556" />
+    <state x="232" y="436" key="Vcs.Push.Dialog.v2/0.0.2560.1400@0.0.2560.1400" timestamp="1587175219470" />
     <state x="767" y="91" width="1716" height="1200" key="com.intellij.history.integration.ui.views.FileHistoryDialog" timestamp="1584759601610">
       <screen x="0" y="0" width="2560" height="1400" />
     </state>
