@@ -23,6 +23,8 @@ APP_EXIT = 1
 Description:
 Application aims to improve data acquisition for future measurements. Some of these improvements include simplifying
 script development so the user can focus on the measurement rather than any of the backend. 
+
+https://scotch.io/tutorials/how-to-push-an-existing-project-to-github
 """
 
 
