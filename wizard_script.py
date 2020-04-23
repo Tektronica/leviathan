@@ -78,13 +78,14 @@ class CodeWriter:
 
     def command_parser(self, commands):
         for level, line in enumerate(commands):
-            cmd = line['code']
-            for var in self.input_variables.keys():
-                if var in cmd:
-                    cmd = cmd.replace(var, '{' + var + '}')
-            for var_saved_result in self.output_variables.keys():
-                cmd = cmd.replace(var_saved_result, '{' + var_saved_result + '}')
-            commands[level]['code'] = "f'" + cmd + "'"
+            if line['choice'] != '':
+                cmd = line['code']
+                for var in self.input_variables.keys():
+                    if var in cmd:
+                        cmd = cmd.replace(var, '{' + var + '}')
+                for var_saved_result in self.output_variables.keys():
+                    cmd = cmd.replace(var_saved_result, '{' + var_saved_result + '}')
+                commands[level]['code'] = "f'" + cmd + "'"
         return commands
 
     def generate_code(self, instr_config, input_variables, permutate, commands, output_variables):
@@ -703,7 +704,20 @@ class WizardFrame(wx.Frame):
 
         ==UNSORTED==
         Retrieves variables used in commands.
-        NOTE: This method returns a set and thus order is not retaiend.
+        NOTE: This method returns a set and thus order is not retained.
+
+        If variable control contains more than one variable separated by a comma, this is treated as an unpack of the
+        command and will be handled as two separate variables being assigned. An example is reading a measurement
+        that was averaged over 10 samples. The method handling this measurement may return not only the average value,
+        but as well as the standard deviation. The returned tuple from that method requires to be unpacked. If, however,
+        the user assigns one variable to the returned tuple, only the first value will be unpacked. This is intended and
+        unpacked values contained in the tuple are funneled into " *_ ".
+
+        [EXAMPLE]
+        var0, var1 = tuple(mean, std)   <-- standard treatment handled by user
+        var0 = tuple(mean, std)         <-- jinja template will interpret this command as:
+                                            var0, 0 = tuple(...)
+
         :return: set(Example) --> {'input': set(inVar0, inVar1), 'output': set(outVar0, outVar1)}
         """
         cmdVars = {'input': set(), 'output': set()}
@@ -713,7 +727,8 @@ class WizardFrame(wx.Frame):
                     cmdVars['input'].add(inVar.variable)
 
             if cmd['variable'] != '' and cmd['code'] != '':
-                cmdVars['output'].add(cmd['variable'])
+                for item in "".join(cmd['variable'].split()).split(','):
+                    cmdVars['output'].add(item)
 
         return cmdVars
 
@@ -733,9 +748,11 @@ class WizardFrame(wx.Frame):
 
         :return: {sample} ---> {'outVar0': rowNum0, 'outVar1': rowNum1, 'outVar2': rowNum2}
         """
-        return {outVar: row
+        return {output_var: row
                 for row, cmd in enumerate(self.GetCommands())
-                if (outVar := cmd['variable']) in self._GetCommandVariables()['output']}
+                if cmd['variable'] != ''
+                for output_var in "".join(cmd['variable'].split()).split(',')}
+
 
     def ReportUsedInstr(self):
         """https://stackoverflow.com/a/34534134/3382269"""
@@ -818,10 +835,10 @@ class WizardFrame(wx.Frame):
             >   https://stackoverflow.com/a/46317361/3382269
         """
         fullstring = text_ctrl.GetValue()
-        variable_dict = self.GetInputVariables()
-        usedVar_dict = self.GetOutputVariables()
+        input_variable_dict = self.GetInputVariables()
+        output_variable_dict = self.GetOutputVariables()
 
-        for variable in variable_dict.keys():
+        for variable in input_variable_dict.keys():
             substring_occurrences = FindSubstringIndices(substring=variable, fullstring=fullstring)
 
             for idx in substring_occurrences:
@@ -830,7 +847,7 @@ class WizardFrame(wx.Frame):
                 text_ctrl.SetStyle(idx, idx + len(variable), wx.TextAttr(wx.RED))
                 text_ctrl.SetStyle(idx + len(variable), -1, wx.TextAttr(wx.BLACK))
 
-        for usedVar in usedVar_dict.keys():
+        for usedVar in output_variable_dict.keys():
             substring_occurrences = FindSubstringIndices(substring=usedVar, fullstring=fullstring)
             for idx in substring_occurrences:
                 print(f'Instance of {usedVar} at ({idx}, {idx + len(usedVar)})')

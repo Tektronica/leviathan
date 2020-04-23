@@ -5,31 +5,38 @@
         {% set self_string = "" -%}
     {% endif -%}
 	{% for cmd in commands -%}
-        {% if cmd[choice] != '' -%}
-            {% if cmd['variable'] != '' -%}
+        {% if cmd['variable'] != '' and cmd['choice'] != '' -%}
+            {%- if cmd['variable'].split(',')|length > 1 -%}
                 {{"\n"}}{{ cmd['variable'] }} = average_reading({{ self_string }}{{ cmd['choice'] }}, {{ cmd['code'] }})
             {%- else -%}
-                {{"\n"}}{{self_string}}{{ cmd['choice'] }}.write({{ cmd['code'] }})
+                {{"\n"}}{{ cmd['variable'] }}, *_ = average_reading({{ self_string }}{{ cmd['choice'] }}, {{ cmd['code'] }})
             {%- endif -%}
-        {% else -%}
-            {{"\n"}}# {{ cmd['code'] }}
-        {%- endif %}
+
+        {%- elif cmd['variable'] != '' and cmd['choice'] == '' -%}
+            {{"\n"}}{{ cmd['variable'] }} = {{ cmd['code'] }}
+
+        {%- elif cmd['variable'] == '' and cmd['choice'] == '' -%}
+            {{"\n"}}{{ cmd['code'] }}
+
+        {%- else -%}
+            {{"\n"}}{{self_string}}{{ cmd['choice'] }}.write({{ cmd['code'] }})
+        {%- endif -%}
     {%- endfor -%}
 	{{ caller() }}
 {%- endmacro %}
 
 {%- macro run_write_loop() -%}
     {% for key in data.keys() -%}
-        {{ "\n" }}_{{ key }} = {{ data[key] }}
+        {{ "\n" }}_{{ key }} = [{{ data[key] }}]
     {%- endfor -%}
 
     {%- if not permutate -%}
         {{ "\n\n" }}# Note that if x and y are not the same length, zip will truncate to the shortest list.
         {{- "\n" }}for {{ ', '.join(data.keys()) }} in zip(_{{ ', _'.join(data.keys()) }}):
         {%- filter indent(4) -%}
-            {% call command_write_loop() %}{% endcall %}
-        {%- endfilter %}
-        {{ "\n\n" }}
+            {% call command_write_loop(is_self=True) %}{% endcall %}
+        {%- endfilter -%}
+        {{ "\n\n" -}}
 
     {% else %}
         {% for key in data.keys() -%}
@@ -40,17 +47,18 @@
         {%- endfor -%}
         {% filter indent(data.keys()|length*4) -%}
             {% call command_write_loop(is_self=True) %}{% endcall %}
-        {%- endfilter %}
-    {%- endif %}
+        {%- endfilter -%}
+        {{ "\n\n" -}}
+    {%- endif -%}
 	{{ caller() }}
 {%- endmacro -%}
 
 from pathlib import Path
 import numpy as np
-import pyunivisa
 import csv
 import sys
 import time
+import pyvisa
 
 # FILE PATH TO SAVE CSV ------------------------------------------------------------------------------------------------
 csv_path = 'output\\csv\\'
@@ -65,32 +73,94 @@ path_to_file = f'results\\{filename}_{time.strftime("%Y%m%d_%H%M")}'
 class Visa:
     def __init__(self, _instr_info):
         self.instr_info = _instr_info
-        self.instr = None   # visa isntance of instrument
-
         self.mode = self.instr_info['mode']
-        # if mode is Ethernet:
-        if self.mode == 'Ethernet':
+
+        self.INSTR = None
+        self.address = None
+        self.port = None
+
+        self.rm = pyvisa.ResourceManager()
+        self.timeout = 3000  # 1 (60e3) minute timeout
+
+        # TODO - verify this works as intended... Otherwise leave INSTR lines commented
+        # if mode is SOCKET:
+        if self.mode == 'SOCKET':
             self.address = self.instr_info['ip_address']
             self.port = self.instr_info['port']
+            # self.INSTR = self.rm.open_resource(f'TCPIP::{self.address}::{self.port}::SOCKET')
+            # self.INSTR.read_termination = '\n'
 
         # if mode is GPIB:
         elif self.mode == 'GPIB':
             self.address = self.instr_info['gpib_address']
+            # self.INSTR = self.rm.open_resource(f'GPIB0::{self.address}::INSTR')
 
+        # if mode is INSTR:
+        elif self.mode == 'INSTR':
+            self.address = self.instr_info['ip_address']
+            # self.INSTR = self.rm.open_resource(f'TCPIP::{self.address}::INSTR')
+            # self.INSTR.read_termination = '\n'
+
+        # if mode is SERIAL:
+        elif self.mode == 'SERIAL':
+            self.address = self.instr_info['ip_address']
+            # self.INSTR = self.rm.open_resource(f'{self.address}')
+            # self.INSTR.read_termination = '\n'
+
+        # TODO - http://lampx.tugraz.at/~hadley/num/ch9/python/9.2.php
+        # if mode is SERIAL:
+        elif self.mode == 'USB':
+            self.address = self.instr_info['ip_address']
+            # self.INSTR = self.rm.open_resource(f'{self.address}')
+            # self.INSTR.read_termination = '\n'
+
+        # if mode is NIGHTHAWK:
+        elif self.mode == 'NIGHTHAWK':
+            self.address = self.instr_info['ip_address']
+            self.port = self.instr_info['port']
+            # self.INSTR = self.rm.open_resource(f'TCPIP::{self.address}::{self.port}::SOCKET')
+            # self.INSTR.read_termination = '>'
+            # self.INSTR.read()
         else:
-            pass
+            print('Failed to connect.')
+
+        # TODO - Leave commented until after verifying visa communication works
+        # self.INSTR.timeout = self.timeout
 
     def info(self):
         print(self.instr_info)
 
-    def idn(self):
-        print(self.read('*IDN?'))
+    def identify(self):
+        print()
+        try:
+            identity = self.query('*IDN?')
+            print(identity + '\n')
+        # TODO - do not use bare except. how to find visa?
+        # except visa.VisaIOError:
+        except:
+            print('Failed to connect to address: ' + self.address)
 
-    def setup_instrument(self):
-        if self.mode == 'Ethernet':
-            self.a = pyunivisa.Client(address=self.address, port=self.port, communication_type='SOCKET')
-        elif self.mode == 'GPIB':
-            self.a = pyunivisa.Client(address=self.address, communication_type='GPIB')
+    def write(self, cmd):
+        self.INSTR.write(f'{cmd}')
+
+    def read(self):
+        response = None
+        if self.mode == 'NIGHTHAWK':
+            response = (self.INSTR.read().split("\r")[0].lstrip())
+        else:
+            response = self.INSTR.read()
+        return response
+
+    def query(self, cmd):
+        response = None
+        if self.mode == 'NIGHTHAWK':
+            response = (self.INSTR.query(f'{cmd}')).split("\r")[0].lstrip()
+        else:
+            response = (self.INSTR.query(f'{cmd}'))
+        return response
+
+    def close(self):
+        self.INSTR.close()
 
 
 # FUNCTION DEFINITIONS -------------------------------------------------------------------------------------------------
@@ -128,7 +198,7 @@ class Test:
         # ESTABLISH COMMUNICATION WITH INSTRUMENTS ---------------------------------------------------------------------
         {%- filter indent(8) -%}
         {%- for instr in instr_config.keys() -%}
-            {{ "\n" }}self.{{ instr }} = CreateInstance({{ instr }}_id)
+            {{ "\n" }}self.{{ instr }} = Visa({{ instr }}_id)
         {%- endfor %}
         {%- endfilter %}
 
@@ -136,8 +206,9 @@ class Test:
     def run(self):
         {%- filter indent(8) -%}
             {%- call run_write_loop() %}{% endcall -%}
-        {%- endfilter %}
+        {%- endfilter -%}
 
+{{"\n" -}}
 def main():
     T = Test()
     T.run()
