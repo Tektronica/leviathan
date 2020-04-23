@@ -10,6 +10,9 @@ import string
 import numpy as np
 import re
 import pyunivisa
+
+import os
+from jinja2 import FileSystemLoader, Environment
 """
 ObjectListView2 is a fork of http://objectlistview.sourceforge.net/python/index.html , as Phillip Piper is no longer
 maintaining the Python version.
@@ -59,6 +62,56 @@ def FindSubstringIndices(substring='', fullstring=''):
     :return: returns a list of indices (x.start()) from the start of the substring matched by group.
     """
     return [x.start() for x in re.finditer(substring, fullstring)]
+
+
+class CodeWriter:
+    def __init__(self):
+        self.input_variables = {}
+        self.output_variables = {}
+        self.commands = []
+        temp = './templates/'
+        TEMPLATE_FILE = "template.py.j2"
+        template_dir = os.path.join(os.path.dirname(__file__), temp)
+        templateLoader = FileSystemLoader(searchpath=template_dir)
+        templateEnv = Environment(loader=templateLoader)
+        self.tm = templateEnv.get_template(TEMPLATE_FILE)
+
+    def command_parser(self, commands):
+        for level, line in enumerate(commands):
+            cmd = line['code']
+            for var in self.input_variables.keys():
+                if var in cmd:
+                    cmd = cmd.replace(var, '{' + var + '}')
+            for var_saved_result in self.output_variables.keys():
+                cmd = cmd.replace(var_saved_result, '{' + var_saved_result + '}')
+            commands[level]['code'] = "f'" + cmd + "'"
+        return commands
+
+    def generate_code(self, instr_config, input_variables, permutate, commands, output_variables):
+        """
+        Understanding Jinja linebreaks: https://stackoverflow.com/a/45719723/3382269
+        Create file if does not exist: https://stackoverflow.com/a/42334034/3382269
+
+        :param instr_config:
+        :param input_variables:
+        :param permutate:
+        :param commands:
+        :param output_variables:
+        :return:
+        """
+        self.input_variables = input_variables
+        self.output_variables = output_variables
+        self.commands = self.command_parser(commands)
+
+        if not os.path.exists('./output/leviathan_out.py'):
+            with open('./output/leviathan_out.py', 'w'):
+                pass
+
+        OUTPUT_FILE = os.path.join(os.path.dirname(__file__), './output/leviathan_out.py')
+        self.tm.stream(instr_config=instr_config,
+                       data=self.input_variables,
+                       permutate=permutate,
+                       commands=self.commands).dump(OUTPUT_FILE)
 
 
 class EditableListCtrl(wx.ListCtrl, listmix.TextEditMixin, listmix.ColumnSorterMixin):
@@ -601,9 +654,8 @@ class WizardFrame(wx.Frame):
         if isinstance(config, dict) and config:
             self.config = config
             self.choiceStringList = ['']
-            for instrID in self.config:
-                instrName = self.config[instrID]['instr']
-                self.choiceStringList.append(instrName)
+            for instr in self.config.keys():
+                self.choiceStringList.append(instr)
             for choice in self.choice:
                 choice.Clear()
                 for item in self.choiceStringList:
@@ -636,6 +688,9 @@ class WizardFrame(wx.Frame):
         self.text_ctrl_12.SetLabelText(traversalString)
 
     def GetCommands(self):
+        """
+        :return: [Example] --> [{'choice': 'choice string', 'code': 'code string', 'variable': 'variable assigned'}]
+        """
         return [{'choice': self.choice[row].GetStringSelection(),
                  'code': code.GetValue(),
                  'variable': self.variable_ctrl[row].GetValue()}
@@ -843,51 +898,20 @@ class WizardFrame(wx.Frame):
 
     def OnGenerateCode(self, e):
         """
+        Generates run function string and then calls on jinja2 to build from template
         https://stackoverflow.com/a/18648679/3382269
         :param e:
         :return:
         """
-        inputVariable_dict = self.GetInputVariables()
-        outputVariable_dict = self.GetOutputVariables()
         commands = self.GetCommands()
+        config_in_commands = {key: self.config[key] for cmd in commands if (key := cmd['choice']) in self.config.keys()}
 
-        for level, line in enumerate(commands):
-            cmd = line['code']
-            for var in inputVariable_dict.keys():
-                if var in cmd:
-                    cmd = cmd.replace(var, 'f{' + var + '}')
-            for var_saved_result in outputVariable_dict.keys():
-                cmd = cmd.replace(var_saved_result, 'f{' + var_saved_result + '}')
-            commands[level]['code'] = cmd
-
-        print("\n# ============================================")
-        for key in inputVariable_dict.keys():
-            print('_' + key + ' = ' + str(inputVariable_dict[key]))
-        print()
-        level = 0
-        if self.radio_box_2.GetSelection() == 0:
-            unpackVars = []
-            for key in inputVariable_dict.keys():
-                unpackVars.append(f'{key}')
-            # Note that if x and y are not the same length, zip will truncate to the shortest list.
-            print(f"for {', '.join(unpackVars)} in zip(_{', _'.join(unpackVars)}):")
-            level += 1
-
-        elif self.radio_box_2.GetSelection() == 1:
-            for key in inputVariable_dict.keys():
-                print(indent(level) + f'for {key} in _{key}')
-                level += 1
-
-        # TODO make tracking indents a class
-        for cmd in commands:
-            if cmd['choice'] != '':
-                if cmd['variable'] != '':
-                    print(indent(level) + cmd['variable'] + ' = ' + f"{cmd['choice']}.read({cmd['code']})")
-                else:
-                    print(indent(level) + f"{cmd['choice']}.write({cmd['code']})")
-            else:
-                print(indent(level) + f"# {cmd['code']}")
-        print("# ============================================")
+        CW = CodeWriter()
+        CW.generate_code(instr_config=config_in_commands,
+                         input_variables=self.GetInputVariables(),
+                         output_variables=self.GetOutputVariables(),
+                         permutate=self.radio_box_2.GetSelection(),
+                         commands=commands)
 
     def OnClear(self, e):
         print('clear')
@@ -898,13 +922,10 @@ class WizardFrame(wx.Frame):
 
 class MyApp(wx.App):
     def OnInit(self):
-        config = {'INSTR0': {'instr': 'f5560A', 'ip_address': '129.196.136.130', 'port': '3490', 'gpib_address': '',
-                             'mode': 'SOCKET'},
-                  'INSTR1': {'instr': 'k34461A', 'ip_address': '10.205.92.67', 'port': '3490', 'gpib_address': '',
-                             'mode': 'SOCKET'},
-                  'INSTR2': {'instr': 'f8846A', 'ip_address': '10.205.92.248', 'port': '3490', 'gpib_address': '',
-                             'mode': 'SOCKET'},
-                  'INSTR3': {'instr': 'f5520A', 'ip_address': '', 'port': '', 'gpib_address': '6', 'mode': 'GPIB'}}
+        config = {'f5560A':  {'ip_address': '129.196.136.130',  'port': '3490', 'gpib_address': '', 'mode': 'SOCKET'},
+                  'k34461A': {'ip_address': '10.205.92.67',     'port': '3490', 'gpib_address': '', 'mode': 'SOCKET'},
+                  'f8846A':  {'ip_address': '10.205.92.248',    'port': '3490', 'gpib_address': '', 'mode': 'SOCKET'},
+                  'f5520A':  {'ip_address': '',                 'port': '',     'gpib_address': '6','mode': 'GPIB'}}
         self.Scrip = WizardFrame(title='Script Wizard', parent=None)
         self.SetTopWindow(self.Scrip)
         self.Scrip.SetChoices(config)

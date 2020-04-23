@@ -1,50 +1,3 @@
-{%- macro command_write_loop(is_self) -%}
-    {% if is_self -%}
-        {% set self_string = "self." -%}
-    {% else -%}
-        {% set self_string = "" -%}
-    {% endif -%}
-	{% for cmd in commands -%}
-        {% if cmd[choice] != '' -%}
-            {% if cmd['variable'] != '' -%}
-                {{"\n"}}{{ cmd['variable'] }} = average_reading({{ self_string }}{{ cmd['choice'] }}, {{ cmd['code'] }})
-            {%- else -%}
-                {{"\n"}}{{self_string}}{{ cmd['choice'] }}.write({{ cmd['code'] }})
-            {%- endif -%}
-        {% else -%}
-            {{"\n"}}# {{ cmd['code'] }}
-        {%- endif %}
-    {%- endfor -%}
-	{{ caller() }}
-{%- endmacro %}
-
-{%- macro run_write_loop() -%}
-    {% for key in data.keys() -%}
-        {{ "\n" }}_{{ key }} = {{ data[key] }}
-    {%- endfor -%}
-
-    {%- if not permutate -%}
-        {{ "\n\n" }}# Note that if x and y are not the same length, zip will truncate to the shortest list.
-        {{- "\n" }}for {{ ', '.join(data.keys()) }} in zip(_{{ ', _'.join(data.keys()) }}):
-        {%- filter indent(4) -%}
-            {% call command_write_loop() %}{% endcall %}
-        {%- endfilter %}
-        {{ "\n\n" }}
-
-    {% else %}
-        {% for key in data.keys() -%}
-            {%- set level = loop.index0 -%}
-            {% filter indent(level*4) -%}
-                {{ "\n" }}for {{ key }} in _{{ key }}:
-            {%- endfilter %}
-        {%- endfor -%}
-        {% filter indent(data.keys()|length*4) -%}
-            {% call command_write_loop(is_self=True) %}{% endcall %}
-        {%- endfilter %}
-    {%- endif %}
-	{{ caller() }}
-{%- endmacro -%}
-
 from pathlib import Path
 import numpy as np
 import pyunivisa
@@ -119,24 +72,29 @@ def average_reading(instrument, cmd, samples=10):
 class Test:
     def __init__(self):
         # CONFIGURED INSTRUMENTS ---------------------------------------------------------------------------------------
-        {%- filter indent(8) -%}
-        {%- for instr in instr_config.keys() -%}
-            {{ "\n" }}{{ instr }}_id = {{ instr_config[instr] }}
-        {%- endfor %}
-        {%- endfilter %}
+        f5560A_id = {'ip_address': '129.196.136.130', 'port': '3490', 'gpib_address': '', 'mode': 'SOCKET'}
+        f5520A_id = {'ip_address': '', 'port': '', 'gpib_address': '6', 'mode': 'GPIB'}
+        f8846A_id = {'ip_address': '10.205.92.248', 'port': '3490', 'gpib_address': '', 'mode': 'SOCKET'}
 
         # ESTABLISH COMMUNICATION WITH INSTRUMENTS ---------------------------------------------------------------------
-        {%- filter indent(8) -%}
-        {%- for instr in instr_config.keys() -%}
-            {{ "\n" }}self.{{ instr }} = CreateInstance({{ instr }}_id)
-        {%- endfor %}
-        {%- endfilter %}
+        self.f5560A = CreateInstance(f5560A_id)
+        self.f5520A = CreateInstance(f5520A_id)
+        self.f8846A = CreateInstance(f8846A_id)
 
     # RUN FUNCTION -----------------------------------------------------------------------------------------------------
     def run(self):
-        {%- filter indent(8) -%}
-            {%- call run_write_loop() %}{% endcall -%}
-        {%- endfilter %}
+        _cur = 0, 1.20E-03, 4.00E-03, 6.00E-03, 9.00E-03, 1.19E-02, 1.2, 11.9, 12, 119, 120, 1000
+        _freq = 0, 50, 70, 100, 200, 500
+                
+        for cur in _cur:
+            for freq in _freq:
+                self.f5560A.write(f'out {cur}A; out {freq}Hz')
+                self.f5560A.write(f'oper')
+                self.f5520A.write(f'SYST:REM')
+                self.f8846A.write(f'CONF:VOLT:AC')
+                rslt = average_reading(self.f8846A, f'READ?')
+                new = average_reading(self., f'{rslt}+1')
+        	
 
 def main():
     T = Test()
@@ -144,4 +102,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main(){{"\n"}}
+    main()
