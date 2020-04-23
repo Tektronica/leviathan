@@ -343,12 +343,12 @@ class MyDialog(wx.Dialog):
                 for row in range(rows - len(self.instrID_text)):
                     self.AddRow()
 
-            for row in range(rows):
-                self.instrID_text[row].SetValue(self.config[f'INSTR{row}']['instr'])
-                self.ipAddress_text[row].SetValue(self.config[f'INSTR{row}']['ip_address'])
-                self.port_text[row].SetValue(self.config[f'INSTR{row}']['port'])
-                self.gpib_text[row].SetValue(self.config[f'INSTR{row}']['gpib_address'])
-                self.mode_choice[row].SetStringSelection(self.config[f'INSTR{row}']['mode'])
+            for row, instr in enumerate(self.config.keys()):
+                self.instrID_text[row].SetValue(instr)
+                self.ipAddress_text[row].SetValue(self.config[instr]['ip_address'])
+                self.port_text[row].SetValue(self.config[instr]['port'])
+                self.gpib_text[row].SetValue(self.config[instr]['gpib_address'])
+                self.mode_choice[row].SetStringSelection(self.config[instr]['mode'])
                 self.toggle_text_ctrl(row)
         else:
             print('no config')
@@ -364,19 +364,27 @@ class MyDialog(wx.Dialog):
         When 'Configuration Settings' dialog is closed using the 'Save' button, all text entries are retrieved and
         written (dumped) to a yaml config file in the running directory.
 
+        yaml.dump has a sort_keys kwarg that is set to True by default. Set to False to no longer reorder.
+            > https://stackoverflow.com/a/55858112/3382269
+
         :param e: event e waits for button press from 'Save'
         :return:
         """
         self.config = {}
         for row in range(len(self.instrID_text)):
-            self.config[f'INSTR{row}'] = {'instr': self.instrID_text[row].GetValue(),
-                                          'ip_address': self.ipAddress_text[row].GetValue(),
-                                          'port': self.port_text[row].GetValue(),
-                                          'gpib_address': self.gpib_text[row].GetValue(),
-                                          'mode': self.mode_choice[row].GetStringSelection()}
+            # self.config[f'INSTR{row}'] = {'instr': self.instrID_text[row].GetValue(),
+            #                               'ip_address': self.ipAddress_text[row].GetValue(),
+            #                               'port': self.port_text[row].GetValue(),
+            #                               'gpib_address': self.gpib_text[row].GetValue(),
+            #                               'mode': self.mode_choice[row].GetStringSelection()}
+            self.config[self.instrID_text[row].GetValue()] = {'ip_address': self.ipAddress_text[row].GetValue(),
+                                                              'port': self.port_text[row].GetValue(),
+                                                              'gpib_address': self.gpib_text[row].GetValue(),
+                                                              'mode': self.mode_choice[row].GetStringSelection()}
+            print(self.config)
 
         with open('instrument_config.yaml', 'w') as f:
-            yaml.dump(self.config, f)
+            yaml.dump(self.config, f, sort_keys=False)
         self.Destroy()
 
     def GetConfig(self):
@@ -405,7 +413,6 @@ class MyApp(wx.App):
     def OnInit(self):
         dialog = MyDialog(None, wx.ID_ANY, "")
         dialog.ShowModal()
-        dialog.Destroy()
         return True
 
 
