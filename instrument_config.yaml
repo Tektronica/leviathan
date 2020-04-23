@@ -1,24 +1,20 @@
-INSTR0:
-  gpib_address: ''
-  instr: f5560A
+f5560A:
   ip_address: 129.196.136.130
-  mode: SOCKET
   port: '3490'
-INSTR1:
   gpib_address: ''
-  instr: k34461A
+  mode: SOCKET
+k34461A:
   ip_address: 10.205.92.67
-  mode: SOCKET
   port: '3490'
-INSTR2:
   gpib_address: ''
-  instr: f8846A
-  ip_address: 10.205.92.248
   mode: SOCKET
+f8846A:
+  ip_address: 10.205.92.248
   port: '3490'
-INSTR3:
-  gpib_address: '6'
-  instr: f5520A
+  gpib_address: ''
+  mode: SOCKET
+f5520A:
   ip_address: ''
-  mode: GPIB
   port: ''
+  gpib_address: '6'
+  mode: GPIB
