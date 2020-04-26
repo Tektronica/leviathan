@@ -107,10 +107,11 @@ class CodeWriter:
         if not os.path.exists('./output/leviathan_out.py'):
             with open('./output/leviathan_out.py', 'w'):
                 pass
-
+        variables = [key for key in self.input_variables.keys()] + [key for key in self.output_variables.keys()]
         OUTPUT_FILE = os.path.join(os.path.dirname(__file__), './output/leviathan_out.py')
         self.tm.stream(instr_config=instr_config,
-                       data=self.input_variables,
+                       input_variables=self.input_variables,
+                       variables_used=variables,
                        permutate=permutate,
                        commands=self.commands).dump(OUTPUT_FILE)
 

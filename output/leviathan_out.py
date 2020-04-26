@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 from matplotlib import cm
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.backends.backend_wxagg import NavigationToolbar2WxAgg as NavigationToolbar
+import threading
 
 # FILE PATH TO SAVE CSV ------------------------------------------------------------------------------------------------
 csv_path = 'output\\csv\\'
@@ -45,33 +46,34 @@ def average_reading(instrument, cmd, samples=10):
 
 
 class Test:
-    def __init__(self):
-        self.tframe = TestFrame
+    def __init__(self, parent):
+        self.parent = parent
         # CONFIGURED INSTRUMENTS ---------------------------------------------------------------------------------------
-        f5560A_id = {'ip_address': '129.196.136.130', 'port': '3490', 'gpib_address': '', 'mode': 'SOCKET'}
-        f5520A_id = {'ip_address': '', 'port': '', 'gpib_address': '6', 'mode': 'GPIB'}
         f8846A_id = {'ip_address': '10.205.92.248', 'port': '3490', 'gpib_address': '', 'mode': 'SOCKET'}
+        k34461A_id = {'ip_address': '10.205.92.67', 'port': '3490', 'gpib_address': '', 'mode': 'SOCKET'}
+        f5560A_id = {'ip_address': '129.196.136.130', 'port': '3490', 'gpib_address': '', 'mode': 'SOCKET'}
 
         # ESTABLISH COMMUNICATION WITH INSTRUMENTS ---------------------------------------------------------------------
-        self.f5560A = Visa(f5560A_id)
-        self.f5520A = Visa(f5520A_id)
         self.f8846A = Visa(f8846A_id)
+        self.k34461A = Visa(k34461A_id)
+        self.f5560A = Visa(f5560A_id)
 
     # RUN FUNCTION -----------------------------------------------------------------------------------------------------
     def run(self):
         _cur = [0, 1.20E-03, 4.00E-03, 6.00E-03, 9.00E-03, 1.19E-02, 1.2, 11.9, 12, 119, 120, 1000]
         _freq = [0, 50, 70, 100, 200, 500]
-
-        # Note that if x and y are not the same length, zip will truncate to the shortest list.
-        for cur, freq in zip(_cur, _freq):
-            self.f5560A.write(f'out {cur}A; out {freq}Hz')
-            self.f5560A.write(f'oper')
-            self.f5520A.write(f'SYST:REM')
-            self.f8846A.write(f'CONF:VOLT:AC')
-            rslt, std = average_reading(self.f8846A, f'READ?')
-            new = rslt + 1
-            print(new)
-            self.tframe.write_to_log([cur, freq])
+                
+        for cur in _cur:
+            for freq in _freq:
+                self.f8846A.write(f'out {cur}A; out {freq}Hz')
+                self.k34461A.write(f'oper')
+                self.f5560A.write(f'SYST:REM')
+                self.f5560A.write(f'CONF:VOLT:AC')
+                rslt, *_ = average_reading(self.k34461A, f'READ?')
+                new = rslt + 1
+                print(new)
+                self.parent.write_to_log([cur, freq, rslt, new])
+                self.parent.write_to_log([cur, freq, rslt, new])
 
 
 class TestFrame(wx.Frame):
@@ -82,6 +84,7 @@ class TestFrame(wx.Frame):
         self.SetSize((1234, 669))
         self.panel_frame = wx.Panel(self, wx.ID_ANY)
 
+        self.thread = threading.Thread(target=self.run, args=())
         self.row = 0
         self.prevLine = ''
         self.line = ''
@@ -136,8 +139,8 @@ class TestFrame(wx.Frame):
         label_1 = wx.StaticText(self.panel_main, wx.ID_ANY, "Test Application")
         label_1.SetFont(wx.Font(20, wx.FONTFAMILY_DECORATIVE, wx.FONTSTYLE_ITALIC, wx.FONTWEIGHT_BOLD, 0, ""))
         grid_sizer_1.Add(label_1, (0, 0), (1, 3), wx.ALIGN_CENTER_VERTICAL, 0)
-        bitmap_1 = wx.StaticBitmap(self.panel_main, wx.ID_ANY, wx.Bitmap("Fluke Logo.png", wx.BITMAP_TYPE_ANY))
-        grid_sizer_1.Add(bitmap_1, (0, 3), (1, 1), wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_RIGHT | wx.ALL, 0)
+        # bitmap_1 = wx.StaticBitmap(self.panel_main, wx.ID_ANY, wx.Bitmap("Fluke Logo.png", wx.BITMAP_TYPE_ANY))
+        # grid_sizer_1.Add(bitmap_1, (0, 3), (1, 1), wx.ALIGN_CENTER_VERTICAL | wx.ALIGN_RIGHT | wx.ALL, 0)
         static_line_1 = wx.StaticLine(self.panel_main, wx.ID_ANY)
         static_line_1.SetMinSize((1200, 2))
         grid_sizer_1.Add(static_line_1, (1, 0), (1, 4), wx.ALIGN_CENTER_VERTICAL | wx.BOTTOM | wx.TOP, 5)
@@ -174,9 +177,12 @@ class TestFrame(wx.Frame):
         self.Layout()
 
     def on_run(self, event):
+        self.thread.start()
+
+    def run(self):
         print('run!')
-        # T = Test()
-        # T.run()
+        T = Test(self)
+        T.run()
 
     def write_to_log(self, row_data):
         self.grid_1.write_list_to_row(self.row, row_data)
@@ -665,6 +671,9 @@ class MyApp(wx.App):
         self.SetTopWindow(self.frame)
         self.frame.Show()
         return True
+
+    def get_test_frame(self):
+        return self.frame
 
 
 def main():
