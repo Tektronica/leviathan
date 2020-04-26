@@ -362,8 +362,8 @@ class WizardFrame(wx.Frame):
         for idx in range(5):
             self.choice[idx].SetSelection(0)
             self.choice[idx].SetMinSize((72, 23))
-            self.code_ctrl[idx].SetMinSize((270, 23))
-            self.variable_ctrl[idx].SetMinSize((40, 23))
+            self.code_ctrl[idx].SetMinSize((230, 23))
+            self.variable_ctrl[idx].SetMinSize((80, 23))
             self.variable_ctrl[idx].SetToolTip("Assign result to variable")
             self.variable_ctrl[idx].SetFont(
                 wx.Font(9, wx.FONTFAMILY_MODERN, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, ""))
@@ -457,7 +457,7 @@ class WizardFrame(wx.Frame):
         label_12.SetFont(wx.Font(9, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD, 0, ""))
         label_10.SetMinSize((34, 16))
         label_11.SetMinSize((72, 16))
-        label_13.SetMinSize((40, 16))
+        label_13.SetMinSize((80, 16))
         grid_sizer_2.Add(section_headers[2],        (0, 0), (1, 6), wx.LEFT | wx.TOP, 10)
         grid_sizer_2.Add(section_descriptions[2],   (1, 0), (1, 6), wx.BOTTOM | wx.LEFT, 10)
         grid_sizer_2.Add(label_10, (2, 0), (1, 1), wx.ALIGN_CENTER_VERTICAL | wx.LEFT | wx.RIGHT, 15)
@@ -673,11 +673,11 @@ class WizardFrame(wx.Frame):
             self.label_32.SetLabel("Sequentially iterates over each variable's data series.")
             self.label_33.SetLabel("Max traversal length = length of shortest series of data")
             self.text_ctrl_12.Enable(False)
+            self.text_ctrl_12.SetLabelText("")
         else:
             self.label_32.SetLabel("Iterates over all permutations as a Gray code sequence")
             self.label_33.SetLabel("The permutation order is indicated below:")
             self.text_ctrl_12.Enable(True)
-            # self.text_ctrl_12.SetHint('Example: "X, Y, Z"                 X changes value slowest.')
             self.UpdateTraversalText()
 
     def GetTraversalOrder(self):
@@ -753,14 +753,21 @@ class WizardFrame(wx.Frame):
                 if cmd['variable'] != ''
                 for output_var in "".join(cmd['variable'].split()).split(',')}
 
-
     def ReportUsedInstr(self):
-        """https://stackoverflow.com/a/34534134/3382269"""
+        """https://stackoverflow.com/a/34534134/3382269
+        Unique item list
+        :return: ['instr0', 'instr1']
+        """
         return list(dict.fromkeys(choice.GetStringSelection() for choice in self.choice))
 
     def ReportInstrList(self):
+        """
+        Reports the instruments used for the commands. List does not necessarily include all possible instrument
+        options.
+        :return: [Example] --> [{'instr0': {'ip_address': '000.000.000'}}, {'instr1': {'ip_address': '111.111.111'}}]
+        """
         instrUsed = self.ReportUsedInstr()
-        return [cfg for row, instr in enumerate(instrUsed) for cfg in self.config.values() if instr == cfg['instr']]
+        return [{instr: self.config[instr]} for instr in enumerate(instrUsed) if instr in self.config.keys()]
 
     def OnAddRow(self, e):
         """
@@ -805,8 +812,8 @@ class WizardFrame(wx.Frame):
         # Set Properties
         self.choice[-1].SetSelection(0)
         self.choice[-1].SetMinSize((72, 23))
-        self.code_ctrl[-1].SetMinSize((270, 23))
-        self.variable_ctrl[-1].SetMinSize((40, 23))
+        self.code_ctrl[-1].SetMinSize((230, 23))
+        self.variable_ctrl[-1].SetMinSize((80, 23))
         self.variable_ctrl[-1].SetFont(wx.Font(9, wx.FONTFAMILY_MODERN,
                                                wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL, 0, ""))
         self.code_ctrl[-1].SetFont(wx.Font(9, wx.FONTFAMILY_MODERN,
@@ -881,8 +888,9 @@ class WizardFrame(wx.Frame):
         # Create dictionary of results assigned to a variable. Repeated variables ignored ------------------------------
         self.savedResult = {var: [] for var in outputVariable_list if var not in self.savedResult.keys()}
 
+        # TODO remove this... in fact, maybe just execute off of the generated code.
         # Initialize instruments ---------------------------------------------------------------------------------------
-        self.instruments = {instr['instr']: pyunivisa.CreateInstance(instr) for instr in self.ReportInstrList()}
+        # self.instruments = {instr['instr']: pyunivisa.CreateInstance(instr) for instr in self.ReportInstrList()}
 
         # Traversal method ---------------------------------------------------------------------------------------------
         dataPts = []
