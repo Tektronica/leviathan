@@ -8,7 +8,7 @@ So, what does it do? It's a...
 1. universal script launcher
 2. data plotter without needing external tools such as Matlab or Octave
 3. instrument setup wizard for easily priortizing which instruments are part of your test
-4. power script wizard that can do just about anything*
+4. powerful script wizard that can do just about anything*
 
 ## Overview
 ![Imgur Image](https://i.imgur.com/x9rFK6M.png?1)
