@@ -62,18 +62,18 @@ class Test:
     def run(self):
         _cur = [0, 1.20E-03, 4.00E-03, 6.00E-03, 9.00E-03, 1.19E-02, 1.2, 11.9, 12, 119, 120, 1000]
         _freq = [0, 50, 70, 100, 200, 500]
-                
-        for cur in _cur:
-            for freq in _freq:
-                self.f8846A.write(f'out {cur}A; out {freq}Hz')
-                self.k34461A.write(f'oper')
-                self.f5560A.write(f'SYST:REM')
-                self.f5560A.write(f'CONF:VOLT:AC')
-                rslt, *_ = average_reading(self.k34461A, f'READ?')
-                new = rslt + 1
-                print(new)
-                self.parent.write_to_log([cur, freq, rslt, new])
-                self.parent.write_to_log([cur, freq, rslt, new])
+
+        # Note that if x and y are not the same length, zip will truncate to the shortest list.
+        for cur, freq in zip(_cur, _freq):
+            self.f8846A.write(f'out {cur}A; out {freq}Hz')
+            self.k34461A.write(f'oper')
+            self.f5560A.write(f'SYST:REM')
+            self.f5560A.write(f'CONF:VOLT:AC')
+            rslt, *_ = average_reading(self.k34461A, f'READ?')
+            new = rslt + 1
+            print(new)
+            self.parent.write_to_log(["cur", "freq", "rslt", "new"])
+            self.parent.write_to_log([cur, freq, rslt, new])
 
 
 class TestFrame(wx.Frame):
