@@ -22,8 +22,8 @@
             {{"\n"}}{{self_string}}{{ cmd['choice'] }}.write({{ cmd['code'] }})
         {%- endif -%}
     {%- endfor -%}
-    {{ "\n" }}self.parent.write_to_log([{{', '.join(variables_used)}}]){{ "\n" -}}
-    self.parent.write_to_log([{{', '.join(variables_used)}}])
+    {{ "\n" }}self.parent.write_to_log(["{{'", "'.join(variables_used)}}"])
+    {{- "\n" }}self.parent.write_to_log([{{', '.join(variables_used)}}])
 	{{- caller() -}}
 {%- endmacro %}
 
@@ -31,26 +31,30 @@
     {% for key in input_variables.keys() -%}
         {{ "\n" }}_{{ key }} = [{{ input_variables[key] }}]
     {%- endfor -%}
+    {%- if not input_variables -%}
+        {% call command_write_loop(is_self=True) %}{% endcall %}
+        {{ "\n" -}}
+    {%- else -%}
+        {%- if not permutate -%}
+            {{ "\n\n" }}# Note that if x and y are not the same length, zip will truncate to the shortest list.
+            {{- "\n" }}for {{ ', '.join(input_variables.keys()) }} in zip(_{{ ', _'.join(input_variables.keys()) }}):
+            {%- filter indent(4) -%}
+                {% call command_write_loop(is_self=True) %}{% endcall %}
+            {%- endfilter -%}
+            {{ "\n\n" -}}
 
-    {%- if not permutate -%}
-        {{ "\n\n" }}# Note that if x and y are not the same length, zip will truncate to the shortest list.
-        {{- "\n" }}for {{ ', '.join(input_variables.keys()) }} in zip(_{{ ', _'.join(input_variables.keys()) }}):
-        {%- filter indent(4) -%}
-            {% call command_write_loop(is_self=True) %}{% endcall %}
-        {%- endfilter -%}
-        {{ "\n\n" -}}
-
-    {% else %}
-        {% for key in input_variables.keys() -%}
-            {%- set level = loop.index0 -%}
-            {% filter indent(level*4) -%}
-                {{ "\n" }}for {{ key }} in _{{ key }}:
-            {%- endfilter %}
-        {%- endfor -%}
-        {% filter indent(input_variables.keys()|length*4) -%}
-            {% call command_write_loop(is_self=True) %}{% endcall %}
-        {%- endfilter -%}
-        {{ "\n\n" -}}
+        {% else %}
+            {% for key in input_variables.keys() -%}
+                {%- set level = loop.index0 -%}
+                {% filter indent(level*4) -%}
+                    {{ "\n" }}for {{ key }} in _{{ key }}:
+                {%- endfilter %}
+            {%- endfor -%}
+            {% filter indent(input_variables.keys()|length*4) -%}
+                {% call command_write_loop(is_self=True) %}{% endcall %}
+            {%- endfilter -%}
+            {{ "\n\n" -}}
+        {%- endif -%}
     {%- endif -%}
 	{{ caller() }}
 {%- endmacro -%}
