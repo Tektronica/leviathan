@@ -1,16 +1,18 @@
 from pathlib import Path
 import numpy as np
-import sys
-import time
-import csv
+import threading
 import pyvisa
+import time
+import sys
+import csv
 import wx
 import wx.grid
+import wx.propgrid as wxpg
+
 import matplotlib.pyplot as plt
-from matplotlib import cm
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.backends.backend_wxagg import NavigationToolbar2WxAgg as NavigationToolbar
-import threading
+
 
 # FILE PATH TO SAVE CSV ------------------------------------------------------------------------------------------------
 csv_path = 'output\\csv\\'
@@ -60,20 +62,16 @@ class Test:
 
     # RUN FUNCTION -----------------------------------------------------------------------------------------------------
     def run(self):
+        import numpy as np
         _cur = [0, 1.20E-03, 4.00E-03, 6.00E-03, 9.00E-03, 1.19E-02, 1.2, 11.9, 12, 119, 120, 1000]
         _freq = [0, 50, 70, 100, 200, 500]
+        self.parent.write_header(["cur", "freq"])
 
         # Note that if x and y are not the same length, zip will truncate to the shortest list.
-        for cur, freq in zip(_cur, _freq):
-            self.f8846A.write(f'out {cur}A; out {freq}Hz')
-            self.k34461A.write(f'oper')
-            self.f5560A.write(f'SYST:REM')
-            self.f5560A.write(f'CONF:VOLT:AC')
-            rslt, *_ = average_reading(self.k34461A, f'READ?')
-            new = rslt + 1
-            print(new)
-            self.parent.write_to_log(["cur", "freq", "rslt", "new"])
-            self.parent.write_to_log([cur, freq, rslt, new])
+        for cur in np.linspace(0, 100, 1000):  # (start, stop, num of points)
+            freq = np.sin(cur)
+            self.parent.write_to_log([cur, freq])
+            self.parent.plot_data()
 
 
 class TestFrame(wx.Frame):
@@ -88,6 +86,9 @@ class TestFrame(wx.Frame):
         self.row = 0
         self.prevLine = ''
         self.line = ''
+        self.table = {}
+        self.ax = None
+        self.x, self.y = [0.], [0.]
 
         self.panel_main = wx.Panel(self.panel_frame, wx.ID_ANY)
         self.notebook = wx.Notebook(self.panel_main, wx.ID_ANY)
@@ -95,13 +96,18 @@ class TestFrame(wx.Frame):
         self.panel_3 = wx.Panel(self.notebook_program, wx.ID_ANY)
         self.text_ctrl_log = wx.TextCtrl(self.panel_3, wx.ID_ANY, "", style=wx.TE_MULTILINE | wx.TE_READONLY)
         self.text_ctrl_log_entry = wx.TextCtrl(self.panel_3, wx.ID_ANY, "", style=wx.TE_PROCESS_ENTER)
+        sys.stdout = self.text_ctrl_log
         self.button_1 = wx.Button(self.panel_3, wx.ID_ANY, "Enter")
-        self.panel_plotter = wx.Panel(self.notebook_program, wx.ID_ANY, style=wx.BORDER_RAISED)
+        self.notebook_1 = wx.Notebook(self.notebook_program, wx.ID_ANY)
+        self.notebook_1_pane_2 = wx.Panel(self.notebook_1, wx.ID_ANY)
 
         self.figure = plt.figure(figsize=(2, 2))  # look into Figure((5, 4), 75)
-        self.canvas = FigureCanvas(self.panel_plotter, -1, self.figure)
+        self.canvas = FigureCanvas(self.notebook_1_pane_2, -1, self.figure)
         self.toolbar = NavigationToolbar(self.canvas)
         self.toolbar.Realize()
+        self.notebook_1_Settings = wx.Panel(self.notebook_1, wx.ID_ANY)
+        # Use PropertyGridManger instead, if pages are desired
+        self.property_grid_1 = wx.propgrid.PropertyGrid(self.notebook_1_Settings, wx.ID_ANY)
 
         self.notebook_Spreadsheet = wx.Panel(self.notebook, wx.ID_ANY)
         self.grid_1 = MyGrid(self.notebook_Spreadsheet)
@@ -122,9 +128,11 @@ class TestFrame(wx.Frame):
         self.SetTitle("Test Application")
         self.text_ctrl_log.SetMinSize((580, 410))
         self.text_ctrl_log_entry.SetMinSize((483, 23))
-        self.canvas.SetMinSize((500, 381))
+        self.canvas.SetMinSize((585, 406))
         self.grid_1.CreateGrid(31, 16)
+        self.grid_1.SetDefaultColSize(150)
         self.notebook.SetMinSize((1200, 500))
+        self._create_plot_properties()
 
     def __do_layout(self):
         # begin wxGlade: TestFrame.__do_layout
@@ -133,6 +141,7 @@ class TestFrame(wx.Frame):
         grid_sizer_1 = wx.GridBagSizer(0, 0)
         sizer_4 = wx.BoxSizer(wx.VERTICAL)
         grid_sizer_2 = wx.GridSizer(1, 2, 0, 0)
+        sizer_5 = wx.BoxSizer(wx.VERTICAL)
         sizer_3 = wx.BoxSizer(wx.VERTICAL)
         grid_sizer_4 = wx.GridBagSizer(0, 0)
         grid_sizer_3 = wx.GridBagSizer(0, 0)
@@ -150,12 +159,17 @@ class TestFrame(wx.Frame):
         self.panel_3.SetSizer(grid_sizer_3)
         grid_sizer_2.Add(self.panel_3, 1, wx.EXPAND, 0)
 
-        grid_sizer_4.Add(self.canvas, (0, 0), (1, 1), wx.ALL | wx.EXPAND, 10)
-        grid_sizer_4.Add(self.toolbar, (1, 0), (1, 1), wx.ALL | wx.EXPAND, 10)
+        grid_sizer_4.Add(self.canvas, (0, 0), (1, 1), wx.ALL | wx.EXPAND)
+        grid_sizer_4.Add(self.toolbar, (1, 0), (1, 1), wx.ALL | wx.EXPAND)
 
         sizer_3.Add(grid_sizer_4, 1, wx.EXPAND, 0)
-        self.panel_plotter.SetSizer(sizer_3)
-        grid_sizer_2.Add(self.panel_plotter, 1, wx.ALL | wx.EXPAND, 10)
+        self.notebook_1_pane_2.SetSizer(sizer_3)
+        sizer_5.Add(self.property_grid_1, 1, wx.EXPAND, 0)
+        self.notebook_1_Settings.SetSizer(sizer_5)
+        self.notebook_1.AddPage(self.notebook_1_pane_2, "Plot")
+        self.notebook_1.AddPage(self.notebook_1_Settings, "Settings")
+        grid_sizer_2.Add(self.notebook_1, 1, wx.EXPAND, 0)
+
         self.notebook_program.SetSizer(grid_sizer_2)
         sizer_4.Add(self.grid_1, 1, wx.EXPAND, 0)
         self.notebook_Spreadsheet.SetSizer(sizer_4)
@@ -176,6 +190,31 @@ class TestFrame(wx.Frame):
         self.SetSizer(sizer_1)
         self.Layout()
 
+    def _create_plot_properties(self):
+        pg = self.property_grid_1
+        # pg.AddPage("Page 1 - Plot Settings")  # if pages are needed, use PropertyGridManger instead
+
+        pg.Append(wxpg.PropertyCategory("1 - Basic Properties"))
+        pg.Append(wxpg.StringProperty(label="Title",    value="Title"))
+        pg.Append(wxpg.StringProperty(label="X Label",  value="X Label"))
+        pg.Append(wxpg.StringProperty(label="Y Label",  value="Y Label"))
+        pg.Append(wxpg.BoolProperty(label="Grid",       value=True))
+        pg.SetPropertyAttribute(id="Grid", attrName="UseCheckbox", value=True)
+
+        pg.Append(wxpg.PropertyCategory("2 - Data"))
+        # https://discuss.wxpython.org/t/wxpython-pheonix-4-0-2-question-regarding-multichoiceproperty-and-setting-the-selection-of-the-choices/30044
+        self.mcp_x = pg.Append(wxpg.MultiChoiceProperty(label="X Data",           choices=['NaN'], value=['NaN']))
+        self.mcp_y = pg.Append(wxpg.MultiChoiceProperty(label="Y Data",           choices=['NaN'], value=['NaN']))
+        self.mcp_labels = pg.Append(wxpg.MultiChoiceProperty(label="Data Labels", choices=['NaN'], value=['NaN']))
+
+        pg.Append(wxpg.PropertyCategory("3 - Advanced Properties"))
+        pg.Append(wxpg.ArrayStringProperty(label="xLim",   value=['0', '100']))
+        pg.Append(wxpg.ArrayStringProperty(label="yLim",   value=['0', '100']))
+        pg.Append(wxpg.DateProperty(label="Date",          value=wx.DateTime.Now()))
+        pg.Append(wxpg.ColourProperty(label="Line Colour", value='#1f77b4'))
+        pg.Append(wxpg.FontProperty(label="Font",          value=self.GetFont()))
+        pg.Grid.FitColumns()
+
     def on_run(self, event):
         self.thread.start()
 
@@ -184,60 +223,54 @@ class TestFrame(wx.Frame):
         T = Test(self)
         T.run()
 
+    def write_header(self, header):
+        if not self.table:
+            self.table = {key: [] for key in header}
+        else:
+            self.table = {header[col]: self.table[key] for col, key in enumerate(self.table.keys())}
+
     def write_to_log(self, row_data):
         self.grid_1.write_list_to_row(self.row, row_data)
         self.row += 1
 
-    def get_data(self, list_data):
-        if isinstance(list_data, (list, np.ndarray)):
-            self.data = np.asarray(list_data).astype(np.float)
-            self.number_of_columns = self.data.shape[1]
-            self.choices = [''] * self.number_of_columns
+        if not self.table:
+            self.table = {f'col {idx}': item for idx, item in enumerate(row_data)}
         else:
-            self.data = np.array([[1, 2, 3], [2, 1, 4]])
-            self.number_of_columns = self.data.shape[1]
-        alphaidx = list(itertools.islice(increment_column_index(), self.number_of_columns))
-        for m in range(self.number_of_columns):
-            self.choices[m] = f'Col:{alphaidx[m]}'
-        for idx in range(3):
-            self.choice_dropdown[idx].SetItems(self.choices)
+            for idx, key in enumerate(self.table.keys()):
+                self.table[key].append(row_data[idx])
 
-        self.choice_dropdown[0].SetSelection(0)
-        self.choice_dropdown[1].SetSelection(1)
-
-        self.x = 0.
-        self.y = [0.]
-        if self.number_of_columns >= 2:
-            self.x = self.data[:, 0]
-            self.y[0] = self.data[:, 1]
+    def plot_data(self):
+        if self.ax:
+            self.update_yAxisData()
         else:
-            self.x, self.y[0] = [1, 2, 3], [2, 1, 4]
-        self.Draw_2DPlot()
+            self.Draw_2DPlot()
 
     def Draw_2DPlot(self):
-        # TODO - https://stackoverflow.com/questions/594266/equation-parsing-in-python
+        if self.table:
+            choices = list(self.table.keys())
+            self.mcp_x.SetChoices(wxpg.PGChoices(choices))
+            self.mcp_y.SetChoices(wxpg.PGChoices(choices))
+            self.mcp_labels.SetChoices(wxpg.PGChoices(choices))
+            # TODO
+            self.property_grid_1.SetPropertyValues({'X Data': choices[0]})
+            self.x, self.y = self.table[choices[0]], [self.table[choices[1]]]
+        else:
+            self.x, self.y = [0.], [[0.]]
+
         self.ax = self.figure.add_subplot(111)
 
         for i, y in enumerate(self.y):
             # plot returns a list of artists of which you want the first element when changing x or y data
-            self.plot = self.ax.plot(self.x, y)
-        self.ax.set_title('2D Plot Title', fontsize=15, fontweight="bold")
-        self.ax.set_ylabel(self.choices[0], fontsize=8)
-        self.ax.set_xlabel(self.choices[1], fontsize=8)
+            self.plot, = self.ax.plot(self.x, y)
 
         self.UpdateAxisLabels()
         self.figure.tight_layout()
         self.toolbar.update()  # Not sure why this is needed - ADS
 
-    def update_yAxisData(self, event):
-        selections = self.choice_dropdown[1].GetSelection()
-        self.y = [0.] * len(selections)
-        for i, column in enumerate(selections):
-            self.y[i] = self.data[:, column]
-
+    def update_yAxisData(self):
         self.ax.clear()
         for i, y in enumerate(self.y):
-            self.plot = self.ax.plot(self.x, y)
+            self.plot, = self.ax.plot(self.x, y)
 
         self.UpdateAxisLabels()
         self.ax.relim()
@@ -245,6 +278,14 @@ class TestFrame(wx.Frame):
 
         self.canvas.draw()
         self.canvas.flush_events()
+
+    def UpdateAxisLabels(self):
+        pg = self.property_grid_1
+        self.ax.set_title(pg.GetPropertyValue('Title'), fontsize=15, fontweight="bold")
+        self.ax.set_xlabel(pg.GetPropertyValue('X Label'), fontsize=8)
+        self.ax.set_ylabel(pg.GetPropertyValue('Y Label'), fontsize=8)
+        self.ax.grid(pg.GetPropertyValue('Grid'))
+        self.plot.set_color(tuple(x/255 for x in pg.GetPropertyValue('Line Colour')))
 
 
 class MyGrid(wx.grid.Grid):
