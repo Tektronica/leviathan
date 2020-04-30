@@ -5,6 +5,7 @@ import pyvisa
 import time
 import sys
 import csv
+import os
 import wx
 import wx.grid
 import wx.propgrid as wxpg
@@ -51,14 +52,8 @@ class Test:
     def __init__(self, parent):
         self.parent = parent
         # CONFIGURED INSTRUMENTS ---------------------------------------------------------------------------------------
-        f8846A_id = {'ip_address': '10.205.92.248', 'port': '3490', 'gpib_address': '', 'mode': 'SOCKET'}
-        k34461A_id = {'ip_address': '10.205.92.67', 'port': '3490', 'gpib_address': '', 'mode': 'SOCKET'}
-        f5560A_id = {'ip_address': '129.196.136.130', 'port': '3490', 'gpib_address': '', 'mode': 'SOCKET'}
 
         # ESTABLISH COMMUNICATION WITH INSTRUMENTS ---------------------------------------------------------------------
-        self.f8846A = Visa(f8846A_id)
-        self.k34461A = Visa(k34461A_id)
-        self.f5560A = Visa(f5560A_id)
 
     # RUN FUNCTION -----------------------------------------------------------------------------------------------------
     def run(self):
@@ -72,7 +67,7 @@ class Test:
             freq = np.sin(cur)
             self.parent.write_to_log([cur, freq])
             self.parent.plot_data()
-
+                
 
 class TestFrame(wx.Frame):
     def __init__(self, *args, **kwds):
@@ -193,7 +188,7 @@ class TestFrame(wx.Frame):
     def _create_plot_properties(self):
         pg = self.property_grid_1
         # pg.AddPage("Page 1 - Plot Settings")  # if pages are needed, use PropertyGridManger instead
-
+        dir_path = os.path.dirname(os.path.realpath(__file__))
         pg.Append(wxpg.PropertyCategory("1 - Basic Properties"))
         pg.Append(wxpg.StringProperty(label="Title",    value="Title"))
         pg.Append(wxpg.StringProperty(label="X Label",  value="X Label"))
@@ -203,9 +198,11 @@ class TestFrame(wx.Frame):
 
         pg.Append(wxpg.PropertyCategory("2 - Data"))
         # https://discuss.wxpython.org/t/wxpython-pheonix-4-0-2-question-regarding-multichoiceproperty-and-setting-the-selection-of-the-choices/30044
-        self.mcp_x = pg.Append(wxpg.MultiChoiceProperty(label="X Data",           choices=['NaN'], value=['NaN']))
-        self.mcp_y = pg.Append(wxpg.MultiChoiceProperty(label="Y Data",           choices=['NaN'], value=['NaN']))
-        self.mcp_labels = pg.Append(wxpg.MultiChoiceProperty(label="Data Labels", choices=['NaN'], value=['NaN']))
+        # https://discuss.wxpython.org/t/how-to-set-propertygrid-values/30152/4
+        pg.Append(wxpg.EnumProperty(label="X Data", name="X Data", labels=['NaN'], values=[0]))
+        pg.Append(wxpg.MultiChoiceProperty(label="Y Data", name='Y Data', choices=['NaN'], value=['NaN']))
+        pg.Append(wxpg.MultiChoiceProperty(label="Data Labels", choices=['NaN'], value=['NaN']))
+        pg.Append(wxpg.FileProperty("Overlay Plot", value=rf"{dir_path}"))
 
         pg.Append(wxpg.PropertyCategory("3 - Advanced Properties"))
         pg.Append(wxpg.ArrayStringProperty(label="xLim",   value=['0', '100']))
@@ -240,19 +237,25 @@ class TestFrame(wx.Frame):
                 self.table[key].append(row_data[idx])
 
     def plot_data(self):
-        if self.ax:
-            self.update_yAxisData()
+        if not self.ax:
+            self.draw_2dplot()
         else:
-            self.Draw_2DPlot()
+            pg = self.property_grid_1
+            # self.x = self.table[pg.GetProperty('X Data').GetValueAsString()]
+            self.x = self.table[pg.GetPropertyValueAsString('X Data')]
+            self.y = [self.table[col] for col in pg.GetPropertyValue('Y Data')]
+            self.update_yAxisData()
 
-    def Draw_2DPlot(self):
+    def draw_2dplot(self):
+        pg = self.property_grid_1
         if self.table:
             choices = list(self.table.keys())
-            self.mcp_x.SetChoices(wxpg.PGChoices(choices))
-            self.mcp_y.SetChoices(wxpg.PGChoices(choices))
-            self.mcp_labels.SetChoices(wxpg.PGChoices(choices))
-            # TODO
-            self.property_grid_1.SetPropertyValues({'X Data': choices[0]})
+            pg.GetProperty('X Data').SetChoices(wxpg.PGChoices(choices))
+            pg.GetProperty('Y Data').SetChoices(wxpg.PGChoices(choices))
+            pg.GetProperty('Data Labels').SetChoices(wxpg.PGChoices(choices))
+            pg.SetPropertyValue('X Data', choices[0])
+            pg.SetPropertyValue('Y Data', [choices[1]])
+
             self.x, self.y = self.table[choices[0]], [self.table[choices[1]]]
         else:
             self.x, self.y = [0.], [[0.]]
