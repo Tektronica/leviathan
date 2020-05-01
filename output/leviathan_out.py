@@ -82,8 +82,10 @@ class TestFrame(wx.Frame):
         self.prevLine = ''
         self.line = ''
         self.table = {}
+        self.overlay = {}
         self.ax = None
-        self.x, self.y = [0.], [0.]
+        self.x, self.y = [0.], [[0.]]
+        self.flag_complete = False
 
         self.panel_main = wx.Panel(self.panel_frame, wx.ID_ANY)
         self.notebook = wx.Notebook(self.panel_main, wx.ID_ANY)
@@ -114,6 +116,8 @@ class TestFrame(wx.Frame):
         # Run Measurement (start subprocess)
         on_run_event = lambda event: self.on_run(event)
         self.Bind(wx.EVT_BUTTON, on_run_event, self.btn_run)
+
+        self.Bind(wxpg.EVT_PG_CHANGED, self.OnGridChangeEvent)
 
         self.__set_properties()
         self.__do_layout()
@@ -199,12 +203,17 @@ class TestFrame(wx.Frame):
         pg.Append(wxpg.PropertyCategory("2 - Data"))
         # https://discuss.wxpython.org/t/wxpython-pheonix-4-0-2-question-regarding-multichoiceproperty-and-setting-the-selection-of-the-choices/30044
         # https://discuss.wxpython.org/t/how-to-set-propertygrid-values/30152/4
-        pg.Append(wxpg.EnumProperty(label="X Data", name="X Data", labels=['NaN'], values=[0]))
-        pg.Append(wxpg.MultiChoiceProperty(label="Y Data", name='Y Data', choices=['NaN'], value=['NaN']))
-        pg.Append(wxpg.MultiChoiceProperty(label="Data Labels", choices=['NaN'], value=['NaN']))
-        pg.Append(wxpg.FileProperty("Overlay Plot", value=rf"{dir_path}"))
+        pg.Append(wxpg.EnumProperty(label="Scale", labels=['Linear', 'SemilogX', 'SemilogY', 'LogLog']))
+        pg.Append(wxpg.EnumProperty(label="X Data",             name="X Data", labels=['NaN'],   values=[0]))
+        pg.Append(wxpg.MultiChoiceProperty(label="Y Data",      name='Y Data', choices=['NaN'],  value=['NaN']))
+        pg.Append(wxpg.EnumProperty(label="Data Labels", name="Data Labels",   labels=['NaN'],   values=[0]))
 
-        pg.Append(wxpg.PropertyCategory("3 - Advanced Properties"))
+        pg.Append(wxpg.PropertyCategory("3 - Optional Static Plot Overlay"))
+        pg.Append(wxpg.FileProperty(label="Overlay Plot", value=rf"{dir_path}"))
+        pg.Append(wxpg.EnumProperty(label="X Axis Variable", labels=['']))
+        pg.Append(wxpg.EnumProperty(label="Y Axis Variable", labels=['']))
+
+        pg.Append(wxpg.PropertyCategory("4 - Advanced Properties"))
         pg.Append(wxpg.ArrayStringProperty(label="xLim",   value=['0', '100']))
         pg.Append(wxpg.ArrayStringProperty(label="yLim",   value=['0', '100']))
         pg.Append(wxpg.DateProperty(label="Date",          value=wx.DateTime.Now()))
@@ -217,8 +226,40 @@ class TestFrame(wx.Frame):
 
     def run(self):
         print('run!')
+        self.flag_complete = False
         T = Test(self)
         T.run()
+        self.flag_complete = True
+
+    def OnGridChangeEvent(self, evt):
+        pg = self.property_grid_1
+        prop = evt.GetProperty()
+        if prop.GetName() == 'Overlay Plot':
+            self.get_static_overlay_data()
+            choices = list(self.overlay.keys())
+            pg.GetProperty('X Axis Variable').SetChoices(wxpg.PGChoices(['Select option'] + choices))
+            pg.GetProperty('Y Axis Variable').SetChoices(wxpg.PGChoices(['Select option'] + choices))
+
+        elif prop.GetName() == 'X Axis Variable' or 'Y Axis Variable' and self.flag_complete:
+            self.update_yAxisData()
+
+    def get_static_overlay_data(self):
+        pg = self.property_grid_1
+        file = pg.GetPropertyValue('Overlay Plot')
+        # Read CSV file
+        kwargs = {'newline': '', 'encoding': "utf-8-sig"}  # https://stackoverflow.com/a/49543191/3382269
+        mode = 'r'
+        if sys.version_info < (3, 0):
+            kwargs.pop('newline', None)
+            mode = 'rb'
+        with open(f'{file}', mode, **kwargs) as csvfile:
+            spamreader = csv.reader(csvfile, delimiter=',', quotechar='"')
+            for row in spamreader:
+                if not self.overlay:
+                    self.overlay = {key: [] for key in row}
+                else:
+                    for idx, key in enumerate(self.overlay.keys()):
+                        self.overlay[key].append(row[idx])
 
     def write_header(self, header):
         if not self.table:
@@ -246,13 +287,39 @@ class TestFrame(wx.Frame):
             self.y = [self.table[col] for col in pg.GetPropertyValue('Y Data')]
             self.update_yAxisData()
 
+    def _plot_helper(self):
+        pg = self.property_grid_1
+        self.plot = [self.ax.plot]*len(self.y)
+        for idx, y in enumerate(self.y):
+            # plot returns a list of artists of which you want the first element when changing x or y data
+            scale = pg.GetPropertyValueAsString('Scale')
+            if scale == 'Linear':
+                self.plot[idx], = self.ax.plot(self.x, y)
+                self.draw_overlay(self.ax.plot)
+            if scale == 'SemilogX':
+                self.plot[idx], = self.ax.semilogx(self.x, y)
+                self.draw_overlay(self.ax.semilogx)
+            if scale == 'SemilogY':
+                self.plot[idx], = self.ax.semilogy(self.x, y)
+                self.draw_overlay(self.ax.semilogy)
+            if scale == 'LogLog':
+                self.plot[idx], = self.ax.loglog(self.x, y)
+                self.draw_overlay(self.ax.loglog)
+
+    def draw_overlay(self, plot_type):
+        pg = self.property_grid_1
+        x_var = pg.GetPropertyValueAsString('X Axis Variable')
+        y_var = pg.GetPropertyValueAsString('Y Axis Variable')
+        if x_var and y_var != ('' or 'Select option'):
+            plot_type(self.overlay[x_var], self.overlay[y_var])
+
     def draw_2dplot(self):
         pg = self.property_grid_1
         if self.table:
             choices = list(self.table.keys())
             pg.GetProperty('X Data').SetChoices(wxpg.PGChoices(choices))
             pg.GetProperty('Y Data').SetChoices(wxpg.PGChoices(choices))
-            pg.GetProperty('Data Labels').SetChoices(wxpg.PGChoices(choices))
+            pg.GetProperty('Data Labels').SetChoices(wxpg.PGChoices([""]+choices))
             pg.SetPropertyValue('X Data', choices[0])
             pg.SetPropertyValue('Y Data', [choices[1]])
 
@@ -261,34 +328,42 @@ class TestFrame(wx.Frame):
             self.x, self.y = [0.], [[0.]]
 
         self.ax = self.figure.add_subplot(111)
+        self._plot_helper()
 
-        for i, y in enumerate(self.y):
-            # plot returns a list of artists of which you want the first element when changing x or y data
-            self.plot, = self.ax.plot(self.x, y)
-
-        self.UpdateAxisLabels()
+        self.update_axis_labels()
         self.figure.tight_layout()
         self.toolbar.update()  # Not sure why this is needed - ADS
 
     def update_yAxisData(self):
         self.ax.clear()
-        for i, y in enumerate(self.y):
-            self.plot, = self.ax.plot(self.x, y)
+        self._plot_helper()
 
-        self.UpdateAxisLabels()
+        self.update_data_labels()
+        self.update_axis_labels()
         self.ax.relim()
         self.ax.autoscale_view()
 
         self.canvas.draw()
         self.canvas.flush_events()
 
-    def UpdateAxisLabels(self):
+    def update_data_labels(self):
+        pg = self.property_grid_1
+        label_var = pg.GetPropertyValueAsString('Data Labels')
+        if label_var:
+            for idx, text in enumerate(self.table[label_var]):
+                plt.annotate(f'{label_var}={round(text, 3)}',
+                             (self.x[idx], self.y[0][idx]),
+                             xytext=(0, 10),
+                             textcoords='offset pixels',
+                             horizontalalignment='center')
+
+    def update_axis_labels(self):
         pg = self.property_grid_1
         self.ax.set_title(pg.GetPropertyValue('Title'), fontsize=15, fontweight="bold")
         self.ax.set_xlabel(pg.GetPropertyValue('X Label'), fontsize=8)
         self.ax.set_ylabel(pg.GetPropertyValue('Y Label'), fontsize=8)
         self.ax.grid(pg.GetPropertyValue('Grid'))
-        self.plot.set_color(tuple(x/255 for x in pg.GetPropertyValue('Line Colour')))
+        self.plot[0].set_color(tuple(x/255 for x in pg.GetPropertyValue('Line Colour')))
 
 
 class MyGrid(wx.grid.Grid):
