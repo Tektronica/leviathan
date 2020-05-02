@@ -26,16 +26,6 @@ path_to_file = f'results\\{filename}_{time.strftime("%Y%m%d_%H%M")}'
 
 
 # FUNCTION DEFINITIONS -------------------------------------------------------------------------------------------------
-def CreateInstance(item):
-    if item['mode'] == 'Ethernet':
-        instr = {'name': item['name'], 'mode': item['mode'], 'ip_address': item['ip_address'], 'port': item['port']}
-    elif item['mode'] == 'GPIB':
-        instr = {'name': item['name'], 'mode': item['mode'], 'gpib_address': item['gpib_address']}
-    else:
-        instr = {'name': item['name'], 'mode': item['mode'], 'ip_address': item['ip_address'], 'port': item['port']}
-    return Visa(instr)
-
-
 def average_reading(instrument, cmd, samples=10):
     data = []
     time.sleep(2)
@@ -52,22 +42,25 @@ class Test:
     def __init__(self, parent):
         self.parent = parent
         # CONFIGURED INSTRUMENTS ---------------------------------------------------------------------------------------
+        k34461A_id = {'ip_address': '10.205.92.155', 'port': '3490', 'gpib_address': '', 'mode': 'INSTR'}
+        f8846A_id = {'ip_address': '10.205.92.113', 'port': '3490', 'gpib_address': '', 'mode': 'SOCKET'}
 
         # ESTABLISH COMMUNICATION WITH INSTRUMENTS ---------------------------------------------------------------------
+        self.k34461A = VisaClient(k34461A_id)
+        self.f8846A = VisaClient(f8846A_id)
 
     # RUN FUNCTION -----------------------------------------------------------------------------------------------------
     def run(self):
-        import numpy as np
-        _cur = [0, 1.20E-03, 4.00E-03, 6.00E-03, 9.00E-03, 1.19E-02, 1.2, 11.9, 12, 119, 120, 1000]
-        _freq = [0, 50, 70, 100, 200, 500]
-        self.parent.write_header(["cur", "freq"])
-
-        # Note that if x and y are not the same length, zip will truncate to the shortest list.
-        for cur in np.linspace(0, 100, 1000):  # (start, stop, num of points)
-            freq = np.sin(cur)
-            self.parent.write_to_log([cur, freq])
-            self.parent.plot_data()
+        self.parent.write_header([""])
+        self.k34461A.write(f'*idn?')
+        self.f8846A.write(f'*idn?')
                 
+        self.close_instruments()
+                    
+    def close_instruments(self):
+        self.k34461A.close()
+        self.f8846A.close()
+
 
 class TestFrame(wx.Frame):
     def __init__(self, *args, **kwds):
@@ -691,75 +684,85 @@ class MyGrid(wx.grid.Grid):
             pass
 
 
-class Visa:
-    def __init__(self, _instr_info):
-        self.instr_info = _instr_info
-        self.mode = self.instr_info['mode']
+class VisaClient:
+    def __init__(self, id):
+        try:
+            self.rm = pyvisa.ResourceManager()
+            self.instr_info = id
+            self.mode = self.instr_info['mode']
+            self.timeout = 3000  # 1 (60e3) minute timeout
+        except ValueError:
+            from textwrap import dedent
+            msg = ("\n[ValueError] - Could not locate a VISA implementation. Install either the NI binary or pyvisa-py."
+                   "\n\n    PyVISA includes a backend that wraps the National Instruments' VISA library by default.\n"
+                   "    PyVISA-py is another such library and can be used for Serial/USB/GPIB/Ethernet\n"
+                   "    See NI-VISA Installation:\n"
+                   "        > https://pyvisa.readthedocs.io/en/1.8/getting_nivisa.html#getting-nivisa\n")
+            print(msg)
+        for attempt in range(5):
+            try:
+                # TODO - verify this works as intended... Otherwise leave INSTR lines commented
+                # if mode is SOCKET:
+                if self.mode == 'SOCKET':
+                    # SOCKET is a non-protocol raw TCP connection
+                    address = self.instr_info['ip_address']
+                    port = self.instr_info['port']
+                    self.INSTR = self.rm.open_resource(f'TCPIP0::{address}::{port}::SOCKET', read_termination='\n')
 
-        self.INSTR = None
-        self.address = None
-        self.port = None
+                # if mode is GPIB:
+                elif self.mode == 'GPIB':
+                    address = self.instr_info['gpib_address']
+                    self.INSTR = self.rm.open_resource(f'GPIB0::{address}::0::INSTR')
 
-        self.rm = pyvisa.ResourceManager()
-        self.timeout = 3000  # 1 (60e3) minute timeout
+                # if mode is INSTR:
+                elif self.mode == 'INSTR':
+                    # INSTR is a VXI-11 protocol
+                    address = self.instr_info['ip_address']
+                    self.INSTR = self.rm.open_resource(f'TCPIP0::{address}::inst0::INSTR', read_termination='\n')
 
-        # TODO - verify this works as intended... Otherwise leave INSTR lines commented
-        # if mode is SOCKET:
-        if self.mode == 'SOCKET':
-            self.address = self.instr_info['ip_address']
-            self.port = self.instr_info['port']
-            # self.INSTR = self.rm.open_resource(f'TCPIP::{self.address}::{self.port}::SOCKET')
-            # self.INSTR.read_termination = '\n'
+                # if mode is SERIAL:
+                elif self.mode == 'SERIAL':
+                    address = self.instr_info['ip_address']
+                    self.INSTR = self.rm.open_resource(f'{address}')
+                    self.INSTR.read_termination = '\n'
 
-        # if mode is GPIB:
-        elif self.mode == 'GPIB':
-            self.address = self.instr_info['gpib_address']
-            # self.INSTR = self.rm.open_resource(f'GPIB0::{self.address}::INSTR')
+                # TODO - http://lampx.tugraz.at/~hadley/num/ch9/python/9.2.php
+                # if mode is SERIAL:
+                elif self.mode == 'USB':
+                    address = self.instr_info['ip_address']
+                    self.INSTR = self.rm.open_resource(f'{address}', read_termination='\n')
 
-        # if mode is INSTR:
-        elif self.mode == 'INSTR':
-            self.address = self.instr_info['ip_address']
-            # self.INSTR = self.rm.open_resource(f'TCPIP::{self.address}::INSTR')
-            # self.INSTR.read_termination = '\n'
+                # if mode is NIGHTHAWK:
+                elif self.mode == 'NIGHTHAWK':
+                    address = self.instr_info['ip_address']
+                    port = self.instr_info['port']
+                    self.INSTR = self.rm.open_resource(f'TCPIP::{address}::{port}::SOCKET', read_termination='>')
+                    self.INSTR.read()
+                else:
+                    print('Failed to connect.')
 
-        # if mode is SERIAL:
-        elif self.mode == 'SERIAL':
-            self.address = self.instr_info['ip_address']
-            # self.INSTR = self.rm.open_resource(f'{self.address}')
-            # self.INSTR.read_termination = '\n'
+                self.INSTR.write('BEEP')
+                print(self.INSTR.query('*IDN?'))
 
-        # TODO - http://lampx.tugraz.at/~hadley/num/ch9/python/9.2.php
-        # if mode is SERIAL:
-        elif self.mode == 'USB':
-            self.address = self.instr_info['ip_address']
-            # self.INSTR = self.rm.open_resource(f'{self.address}')
-            # self.INSTR.read_termination = '\n'
+                self.INSTR.timeout = self.timeout
 
-        # if mode is NIGHTHAWK:
-        elif self.mode == 'NIGHTHAWK':
-            self.address = self.instr_info['ip_address']
-            self.port = self.instr_info['port']
-            # self.INSTR = self.rm.open_resource(f'TCPIP::{self.address}::{self.port}::SOCKET')
-            # self.INSTR.read_termination = '>'
-            # self.INSTR.read()
+            # TODO - does this exception work? Not currently...
+            except pyvisa.VisaIOError:
+                print(f'[attempt {attempt + 1}/5] - retrying connection to instrument')
+            else:
+                break
         else:
-            print('Failed to connect.')
-
-        # TODO - Leave commented until after verifying visa communication works
-        # self.INSTR.timeout = self.timeout
+            print('Invalid session handle. The resource might be closed.')
 
     def info(self):
-        print(self.instr_info)
+        return self.instr_info
 
-    def identify(self):
-        print()
+    def IDN(self):
         try:
-            identity = self.query('*IDN?')
-            print(identity + '\n')
-        # TODO - do not use bare except. how to find visa?
-        # except visa.VisaIOError:
-        except:
-            print('Failed to connect to address: ' + self.address)
+            print(self.INSTR.query('*IDN?'))
+        # TODO - does this work now?
+        except pyvisa.VisaIOError:
+            print('Failed to connect to address.')
 
     def write(self, cmd):
         self.INSTR.write(f'{cmd}')
