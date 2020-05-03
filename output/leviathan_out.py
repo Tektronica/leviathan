@@ -1,7 +1,7 @@
 from pathlib import Path
 import numpy as np
 import threading
-import pyvisa
+import visa
 import time
 import sys
 import csv
@@ -54,7 +54,6 @@ class Test:
         self.parent.write_header([""])
         self.k34461A.write(f'*idn?')
         self.f8846A.write(f'*idn?')
-                
         self.close_instruments()
                     
     def close_instruments(self):
@@ -71,6 +70,7 @@ class TestFrame(wx.Frame):
         self.panel_frame = wx.Panel(self, wx.ID_ANY)
 
         self.thread = threading.Thread(target=self.run, args=())
+        self.thread.daemon = True
         self.row = 0
         self.prevLine = ''
         self.line = ''
@@ -102,6 +102,7 @@ class TestFrame(wx.Frame):
         self.notebook_Spreadsheet = wx.Panel(self.notebook, wx.ID_ANY)
         self.grid_1 = MyGrid(self.notebook_Spreadsheet)
         self.btn_run = wx.Button(self.panel_main, wx.ID_ANY, "Run Test")
+        # TODO - Pause: https://stackoverflow.com/a/34313474/3382269
         self.btn_pause = wx.Button(self.panel_main, wx.ID_ANY, "Pause")
         self.btn_stop = wx.Button(self.panel_main, wx.ID_ANY, "Stop")
         self.btn_save = wx.Button(self.panel_main, wx.ID_ANY, "Save")
@@ -687,7 +688,7 @@ class MyGrid(wx.grid.Grid):
 class VisaClient:
     def __init__(self, id):
         try:
-            self.rm = pyvisa.ResourceManager()
+            self.rm = visa.ResourceManager()
             self.instr_info = id
             self.mode = self.instr_info['mode']
             self.timeout = 3000  # 1 (60e3) minute timeout
@@ -746,8 +747,8 @@ class VisaClient:
 
                 self.INSTR.timeout = self.timeout
 
-            # TODO - does this exception work? Not currently...
-            except pyvisa.VisaIOError:
+            except (visa.VisaIOError, Exception) as e:
+                # https://github.com/pyvisa/pyvisa-py/issues/146#issuecomment-453695057
                 print(f'[attempt {attempt + 1}/5] - retrying connection to instrument')
             else:
                 break
@@ -761,7 +762,7 @@ class VisaClient:
         try:
             print(self.INSTR.query('*IDN?'))
         # TODO - does this work now?
-        except pyvisa.VisaIOError:
+        except visa.VisaIOError:
             print('Failed to connect to address.')
 
     def write(self, cmd):

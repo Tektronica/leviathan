@@ -9,7 +9,6 @@ import itertools
 import string
 import numpy as np
 import re
-import pyunivisa
 
 import os
 from jinja2 import FileSystemLoader, Environment
@@ -948,9 +947,9 @@ class WizardFrame(wx.Frame):
 
 class MyApp(wx.App):
     def OnInit(self):
-        config = {'f5560A':  {'ip_address': '129.196.136.130',  'port': '3490', 'gpib_address': '', 'mode': 'SOCKET'},
-                  'k34461A': {'ip_address': '10.205.92.67',     'port': '3490', 'gpib_address': '', 'mode': 'SOCKET'},
-                  'f8846A':  {'ip_address': '10.205.92.248',    'port': '3490', 'gpib_address': '', 'mode': 'SOCKET'},
+        config = {'f5560A':  {'ip_address': '129.196.136.130',  'port': '3490', 'gpib_address': '', 'mode': 'NIGHTHAWK'},
+                  'k34461A': {'ip_address': '10.205.92.155',     'port': '3490', 'gpib_address': '', 'mode': 'INSTR'},
+                  'f8846A':  {'ip_address': '10.205.92.113',    'port': '3490', 'gpib_address': '', 'mode': 'SOCKET'},
                   'f5520A':  {'ip_address': '',                 'port': '',     'gpib_address': '6','mode': 'GPIB'}}
         self.Scrip = WizardFrame(title='Script Wizard', parent=None)
         self.SetTopWindow(self.Scrip)
