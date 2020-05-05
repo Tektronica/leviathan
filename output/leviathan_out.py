@@ -28,9 +28,9 @@ path_to_file = f'results\\{filename}_{time.strftime("%Y%m%d_%H%M")}'
 # FUNCTION DEFINITIONS -------------------------------------------------------------------------------------------------
 def average_reading(instrument, cmd, samples=10):
     data = []
-    time.sleep(2)
+    time.sleep(5)
     for idx in range(samples):
-        data.append(float(instrument.read(cmd).split(',')[0]))
+        data.append(float(instrument.query(cmd).split(',')[0]))
         time.sleep(0.20)
     array = np.asarray(data)
     mean = array.mean()
@@ -42,23 +42,71 @@ class Test:
     def __init__(self, parent):
         self.parent = parent
         # CONFIGURED INSTRUMENTS ---------------------------------------------------------------------------------------
+        f5560A_id = {'ip_address': '129.196.136.130', 'port': '3490', 'gpib_address': '', 'mode': 'NIGHTHAWK'}
+        f5790A_id = {'ip_address': '', 'port': '', 'gpib_address': '6', 'mode': 'GPIB'}
         k34461A_id = {'ip_address': '10.205.92.155', 'port': '3490', 'gpib_address': '', 'mode': 'INSTR'}
-        f8846A_id = {'ip_address': '10.205.92.113', 'port': '3490', 'gpib_address': '', 'mode': 'SOCKET'}
 
         # ESTABLISH COMMUNICATION WITH INSTRUMENTS ---------------------------------------------------------------------
+        self.f5560A = VisaClient(f5560A_id)
+        self.f5790A = VisaClient(f5790A_id)
         self.k34461A = VisaClient(k34461A_id)
-        self.f8846A = VisaClient(f8846A_id)
+
+    # SETUP ------------------------------------------------------------------------------------------------------------
+    def setup(self):
+        self.f5790A.write(f'*RST; INPUT INPUT2; EXTRIG OFF; HIRES ON; EXTGUARD ON')
+        self.k34461A.write('*RST;CONF:VOLT:DC')
+        self.f5560A.write('*RST')
 
     # RUN FUNCTION -----------------------------------------------------------------------------------------------------
     def run(self):
-        self.parent.write_header([""])
-        self.k34461A.write(f'*idn?')
-        self.f8846A.write(f'*idn?')
+        self.setup()
+        _freq = [1000]
+        _cur = [119e-3]
+        _range_label = ["120uA", "1.2mA", "12mA", "120mA"]
+        # _cur = [11.9e-3]
+        self.parent.write_header(["range", "freq", "cur", "nom", "nom_dist",
+                                  "loaded", "loaded_dist", "resistor", "cur_shift", "ppm_shift"])
+
+        for freq in _freq:
+            for idx, cur in enumerate(_cur):
+                self.f5560A.write(f'out {cur}A;out {freq}Hz ')
+
+                print('===================================================')
+                print(f'\nOperating in {_range_label[idx]} range at {cur}A')
+                resistor = input('\nSpecify the sense resistor in ohms:')
+                input('\nReady to operate?')
+                self.f5560A.write(f'OPER')
+
+                self.f5790A.write(f'TRIG')
+                nom, *_ = average_reading(self.f5790A, f'*WAI;VAL?')
+                nom = nom / float(resistor)
+                self.k34461A.write('SYST:REM')
+                nom_dist, *_ = average_reading(self.k34461A, f'READ?')
+                nom_dist = round(nom_dist / 100e-3, 4)
+                self.f5560A.write(f'STBY')
+
+                input('\nConnect 400uH. Ready to operate?')
+                self.f5560A.write(f'OPER')
+                loaded, *_ = average_reading(self.f5790A, f'*WAI;VAL?')
+                loaded = loaded / float(resistor)
+                self.k34461A.write('SYST:REM')
+                loaded_dist, *_ = average_reading(self.k34461A, f'READ?')
+                loaded_dist = round(loaded_dist / 100e-3, 4)
+                self.f5560A.write(f'STBY')
+
+                cur_shift = loaded - nom
+                ppm_shift = round((cur_shift / nom) * 1e6, 2)
+
+                self.parent.write_to_log([_range_label[idx], freq, cur, nom, nom_dist,
+                                          loaded, loaded_dist, resistor, cur_shift, ppm_shift])
+                self.parent.plot_data()
+
         self.close_instruments()
-                    
+
     def close_instruments(self):
+        self.f5560A.close()
+        self.f5790A.close()
         self.k34461A.close()
-        self.f8846A.close()
 
 
 class TestFrame(wx.Frame):
@@ -260,6 +308,9 @@ class TestFrame(wx.Frame):
             self.table = {key: [] for key in header}
         else:
             self.table = {header[col]: self.table[key] for col, key in enumerate(self.table.keys())}
+
+        self.grid_1.write_list_to_row(self.row, self.table.keys())
+        self.row += 1
 
     def write_to_log(self, row_data):
         self.grid_1.write_list_to_row(self.row, row_data)
@@ -691,7 +742,7 @@ class VisaClient:
             self.rm = visa.ResourceManager()
             self.instr_info = id
             self.mode = self.instr_info['mode']
-            self.timeout = 3000  # 1 (60e3) minute timeout
+            self.timeout = 60000  # 1 (60e3) minute timeout
         except ValueError:
             from textwrap import dedent
             msg = ("\n[ValueError] - Could not locate a VISA implementation. Install either the NI binary or pyvisa-py."
@@ -738,7 +789,7 @@ class VisaClient:
                     address = self.instr_info['ip_address']
                     port = self.instr_info['port']
                     self.INSTR = self.rm.open_resource(f'TCPIP::{address}::{port}::SOCKET', read_termination='>')
-                    self.INSTR.read()
+                    self.read()
                 else:
                     print('Failed to connect.')
 

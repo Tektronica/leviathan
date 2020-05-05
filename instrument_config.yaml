@@ -2,18 +2,18 @@ f5560A:
   ip_address: 129.196.136.130
   port: '3490'
   gpib_address: ''
-  mode: SOCKET
+  mode: NIGHTHAWK
 k34461A:
-  ip_address: 10.205.92.67
+  ip_address: 10.205.92.155
   port: '3490'
   gpib_address: ''
-  mode: SOCKET
+  mode: INSTR
 f8846A:
-  ip_address: 10.205.92.248
+  ip_address: 10.205.92.113
   port: '3490'
   gpib_address: ''
   mode: SOCKET
-f5520A:
+f5790A:
   ip_address: ''
   port: ''
   gpib_address: '6'

@@ -90,9 +90,9 @@ path_to_file = f'results\\{filename}_{time.strftime("%Y%m%d_%H%M")}'
 # FUNCTION DEFINITIONS -------------------------------------------------------------------------------------------------
 def average_reading(instrument, cmd, samples=10):
     data = []
-    time.sleep(2)
+    time.sleep(5)
     for idx in range(samples):
-        data.append(float(instrument.read(cmd).split(',')[0]))
+        data.append(float(instrument.query(cmd).split(',')[0]))
         time.sleep(0.20)
     array = np.asarray(data)
     mean = array.mean()
@@ -331,6 +331,9 @@ class TestFrame(wx.Frame):
             self.table = {key: [] for key in header}
         else:
             self.table = {header[col]: self.table[key] for col, key in enumerate(self.table.keys())}
+
+        self.grid_1.write_list_to_row(self.row, self.table.keys())
+        self.row += 1
 
     def write_to_log(self, row_data):
         self.grid_1.write_list_to_row(self.row, row_data)
@@ -762,7 +765,7 @@ class VisaClient:
             self.rm = visa.ResourceManager()
             self.instr_info = id
             self.mode = self.instr_info['mode']
-            self.timeout = 3000  # 1 (60e3) minute timeout
+            self.timeout = 60000  # 1 (60e3) minute timeout
         except ValueError:
             from textwrap import dedent
             msg = ("\n[ValueError] - Could not locate a VISA implementation. Install either the NI binary or pyvisa-py."
@@ -809,7 +812,7 @@ class VisaClient:
                     address = self.instr_info['ip_address']
                     port = self.instr_info['port']
                     self.INSTR = self.rm.open_resource(f'TCPIP::{address}::{port}::SOCKET', read_termination='>')
-                    self.INSTR.read()
+                    self.read()
                 else:
                     print('Failed to connect.')
 
